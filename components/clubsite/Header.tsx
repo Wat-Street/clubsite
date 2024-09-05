@@ -6,7 +6,7 @@ import Socials from "@/components/clubsite/Socials";
 const Header = (props: { defaultPage: number }) => {
     return (
         <div className="w-full h-20 sm:px-20 grid grid-cols-2 items-center pt-6 sm:pt-4">
-            <div>
+            <div className="justify-self-start">
                 <a href="/">
                     <Image
                         src={logo}
