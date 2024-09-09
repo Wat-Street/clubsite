@@ -17,7 +17,7 @@ const Team = () => {
             <div className="memberCards">
                 <div className="flex flex-wrap justify-center gap-x-3 gap-y-[6px]">
                     {execs.map((exec) => (
-                        <div className="memberCard execCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-48 rounded-lg bg-neutral-800">
+                        <div className="memberCard execCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-48 rounded-lg bg-[#333333]">
                             <div className="memberCardBorder"></div>
                             <div className="memberCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] rounded-lg bg-black flex flex-col">
                                 <Image
@@ -39,7 +39,7 @@ const Team = () => {
                     ))}
                     <div className="hidden sm:flex sm:basis-full"></div>
                     {leads.map((lead) => (
-                        <div className="memberCard execCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-48 rounded-lg bg-neutral-800 col-span-2">
+                        <div className="memberCard execCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-48 rounded-lg bg-[#333333] col-span-2">
                             <div className="memberCardBorder"></div>
                             <div className="memberCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] rounded-lg bg-black flex flex-col">
                                 <Image
@@ -62,7 +62,7 @@ const Team = () => {
                 </div>
                 <div className="flex flex-wrap justify-center gap-3 gap-y-3 mt-3">
                     {team.map((member) => (
-                        <div className="memberCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-24 rounded-lg bg-neutral-800">
+                        <div className="memberCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-24 rounded-lg bg-[#333333]">
                             <div className="memberCardBorder"></div>
                             <div className="memberCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] rounded-lg bg-black flex flex-col">
                                 <div className="my-auto">
@@ -79,7 +79,7 @@ const Team = () => {
                 </div>
             </div>
 
-            <div className="mt-16 text-neutral-50 text-lg sm:text-xl font-semibold">
+            <div className="mt-16 text-neutral-200 text-lg sm:text-xl font-semibold">
                 Our advisors have worked at:
             </div>
             <div className="mt-3 sm:mt-8 inline-flex flex-nowrap w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_30px,_black_calc(100%-30px),transparent_100%)] sm:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">

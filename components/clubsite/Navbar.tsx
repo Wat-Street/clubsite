@@ -42,15 +42,15 @@ const Navbar = (props: { defaultPage: number }) => {
 
     return (
         <div>
-            <div className="rounded-xl bg-black/10 backdrop-blur-md backdrop-brightness-75 border border-1 border-[#dddddd]/20 hover:border-[#ffd978]/30 transition ease-in-out duration-200">
+            <div className="rounded-xl bg-black/10 backdrop-blur-md backdrop-brightness-75 border border-1 border-[#333333] hover:border-[#56461a] hover:bg-black/50 transition ease-in-out duration-200">
                 <ul className="flex gap-1 px-1 py-1">
                     {navLinks.map((item, key) => (
                         <a href={item.href} onClick={() => onClick(item, key)}>
                             <li
                                 key={item.name}
                                 className={`${
-                                    key === visibleKey ? "bg-[#dddddd]/10" : ""
-                                } px-6 py-2 rounded-lg text-neutral-50 hover:bg-[#ffd978]/20 transition ease-in-out duration-200`}
+                                    key === visibleKey ? "bg-[#333333]" : ""
+                                } px-6 py-2 rounded-lg text-neutral-50 hover:bg-[#56461a]/60 transition ease-in-out duration-200`}
                             >
                                 {item.name}
                             </li>

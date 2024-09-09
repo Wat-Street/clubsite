@@ -26,7 +26,7 @@ const page = ({ params }: { params: { slug: string } }) => {
             <div className="relative">
                 <div className="absolute -left-24 pt-10">
                     <a href="/research" className="hidden lg:block fixed group">
-                        <div className="ml-2 group-hover:-translate-x-2 ease-in-out duration-300 group">
+                        <div className="ml-2 group-hover:-translate-x-2 ease-in-out duration-300 group text-neutral-200">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="currentColor"

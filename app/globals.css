@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 
+outline gray: #333333 
+
+primary gold: #56461a
+bright accent gold: #c28b00
+
+primary text: neutral-50
+secondary text: neutral-200
+
+hover-card bg gold: #56411a50
+hover-card border gold: #c28b00bb
+*/
+
 @layer base {
     :root {
         --background: 0 0% 100%;
@@ -63,36 +76,6 @@ body {
     overscroll-behavior: none;
 }
 
-.animate-graph {
-    stroke-dasharray: 100 4350;
-    stroke-dashoffset: 0;
-    animation: dash 5s infinite linear;
-}
-
-.graphPath {
-    stroke-dasharray: 5000;
-    stroke-dashoffset: 0;
-    animation: graphDash 5s linear;
-}
-
-@keyframes graphDash {
-    from {
-        stroke-dashoffset: 0;
-    }
-    to {
-        stroke-dashoffset: 3100;
-    }
-}
-
-@keyframes dash {
-    from {
-        stroke-dashoffset: 0;
-    }
-    to {
-        stroke-dashoffset: 2000;
-    }
-}
-
 @media all and (min-width: 0px) and (max-width: 639px) {
     .teamPic {
         opacity: 40%;
@@ -124,7 +107,7 @@ body {
 .memberCard::before {
     background: radial-gradient(
         600px circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 187, 15, 0.1) 0%,
+        #56411a50 0%,
         rgba(0, 0, 0, 0) 30%
     );
     content: "";
@@ -144,8 +127,8 @@ body {
 .memberCard .memberCardBorder {
     background: radial-gradient(
         600px circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 187, 15, 0.259) 0%,
-        rgba(0, 0, 0, 0) 50%
+        #c28b00bb 0%,
+        rgba(0, 0, 0, 0) 40%
     );
     content: "";
     position: absolute;
@@ -181,7 +164,7 @@ body {
 .projCard::before {
     background: radial-gradient(
         800px circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 187, 15, 0.1) 0%,
+        #56411a50 0%,
         rgba(0, 0, 0, 0) 30%
     );
     content: "";
@@ -200,9 +183,9 @@ body {
 
 .projCard .projCardBorder {
     background: radial-gradient(
-        1000px circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 187, 15, 0.26) 0%,
-        rgba(0, 0, 0, 0) 50%
+        800px circle at var(--mouse-x) var(--mouse-y),
+        #c28b00bb 0%,
+        rgba(0, 0, 0, 0) 30%
     );
     content: "";
     position: absolute;

@@ -14,7 +14,7 @@ const About = () => {
             </div> */}
             <div className="relative">
                 {/* <Paragraph paragraph={paragraph} /> */}
-                <div className="text-3xl sm:text-4xl text-white/30 font-semibold text-wrap">
+                <div className="text-3xl sm:text-4xl text-[#333333] font-semibold text-wrap">
                     {paragraph}
                 </div>
                 <div className=" font-semibold text-neutral-50">

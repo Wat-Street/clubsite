@@ -57,8 +57,8 @@ export default function HomePage() {
                             // setActiveTags([]);
                             setActiveTag("");
                         }}
-                        className={`${allActive ? "bg-[#2c2d2d]" : ""}
-                        px-4 py-2 border border-1 border-[#2c2d2d] rounded-2xl hover:bg-[#2c2d2d] transition ease-in-out duration-200`}
+                        className={`${allActive ? "bg-[#333333]" : ""}
+                        px-4 py-2 border border-1 border-[#333333] rounded-2xl hover:bg-[#333333] transition ease-in-out duration-200`}
                     >
                         All
                     </button>
@@ -67,9 +67,9 @@ export default function HomePage() {
                             onClick={() => handleTagClick(tag.name)}
                             className={`${
                                 // activeTags.includes(tag.name)
-                                activeTag === tag.name ? "bg-[#2c2d2d]/80" : ""
+                                activeTag === tag.name ? "bg-[#333333]/80" : ""
                             }
-                                px-4 py-2 border border-1 border-[#2c2d2d] rounded-2xl hover:bg-[#2c2d2d] transition ease-in-out duration-200`}
+                                px-4 py-2 border border-1 border-[#333333] rounded-2xl hover:bg-[#333333] transition ease-in-out duration-200`}
                         >
                             {tag.name}
                         </button>

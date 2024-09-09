@@ -13,7 +13,7 @@ const PaperPreview = (props: {
         <div>
             {/* this is for desktop view */}
             <div className="hidden md:block">
-                <div className="md:h-72 w-full rounded-md p-4 border border-1 border-[#2c2d2d] relative group/card hover:bg-[#ffbb0f]/5 hover:border-[#ffbb0f]/25 transition ease-in-out duration-300">
+                <div className="md:h-72 w-full rounded-md p-4 border border-1 border-[#333333] relative group/card hover:bg-[#56461a]/20 hover:border-[#56461a] transition ease-in-out duration-300">
                     <div className="text-pretty">
                         <div className="text-xl font-bold text-neutral-50">
                             {props.title}
@@ -31,7 +31,7 @@ const PaperPreview = (props: {
                                 return (
                                     <div
                                         key={key}
-                                        className="px-2 py-1 bg-[#2c2d2d]/0 border border-[#2c2d2d] text-neutral-200 rounded-md text-xs font-semibold group-hover/card:border-[#ffbb0f]/20 transition ease-in-out duration-300"
+                                        className="px-2 py-1 bg-[#2c2d2d]/0 border border-[#333333] text-neutral-200 rounded-md text-xs font-semibold group-hover/card:border-[#56461a] transition ease-in-out duration-300"
                                     >
                                         {tag}
                                     </div>
@@ -47,7 +47,7 @@ const PaperPreview = (props: {
                                         : `w-full pr-1`
                                 }
                             >
-                                <div className="px-2 py-3 bg-[#2c2d2d] text-neutral-200 rounded-md text-sm group border border-[#2c2d2d]/0 group-hover/card:bg-[#ffbb0f]/15   transition ease-in-out duration-300 hover:border hover:border-[#ffbb0f]/25 text-center">
+                                <div className="px-2 py-3 bg-[#333333] text-neutral-200 rounded-md text-sm group border border-[#333333]/0 group-hover/card:bg-[#56461a]/40 transition ease-in-out duration-300 hover:border hover:border-[#ffbb0f]/25 text-center">
                                     Paper
                                     <span>
                                         <svg
@@ -75,7 +75,7 @@ const PaperPreview = (props: {
                                     rel="noreferrer noopener"
                                     className="w-1/2 pl-1"
                                 >
-                                    <div className="px-2 py-3 bg-[#2c2d2d] text-neutral-200 rounded-md text-sm group border border-[#2c2d2d]/0 group-hover/card:bg-[#ffbb0f]/15   transition ease-in-out duration-300 hover:border hover:border-[#ffbb0f]/25 text-center">
+                                    <div className="px-2 py-3 bg-[#333333] text-neutral-200 rounded-md text-sm group border border-[#333333]/0 group-hover/card:bg-[#56461a]/40 transition ease-in-out duration-300 hover:border hover:border-[#ffbb0f]/25 text-center">
                                         Github
                                         <span>
                                             <svg

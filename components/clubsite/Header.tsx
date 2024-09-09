@@ -11,7 +11,7 @@ const Header = (props: { defaultPage: number }) => {
                     <Image
                         src={logo}
                         alt="logo"
-                        className="-mt-1.5 w-[70px] h-[70px] justify-self-start drop-shadow-[0_0px_25px_rgba(251,228,159,0.5)] overflow-visible"
+                        className="-mt-1.5 w-[70px] h-[70px] justify-self-start drop-shadow-[0_0px_25px_rgba(251,228,159,0.6)]"
                     />
                 </a>
             </div>
