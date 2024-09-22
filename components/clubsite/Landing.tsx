@@ -16,7 +16,7 @@ const Landing = () => {
                     href="https://forms.gle/Tr4LMB2VgTQ6CMDc6"
                     target="_blank"
                 >
-                    Join our Team
+                    Join Our Team
                 </a>
             </div>
             <div>
