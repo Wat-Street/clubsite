@@ -71,7 +71,8 @@ export const team = [
     { name: "Brian Zhang", team: "Frontend" },
     { name: "Rafael", team: "Frontend" },
 
-    { name: "Alekszander Martin Olah", team: "Quant" },
+    { name: "Alekszandr Martin Olah", team: "Quant" },
+    { name: "Richard Fan", team: "Quant" },
     { name: "Jacob Yan", team: "Quant" },
     { name: "Suraj Sivaraja", team: "Quant" },
     { name: "Denys Inhul", team: "Quant" },
