@@ -13,26 +13,8 @@ import { researchData, tags } from "@/lib/researchData";
 
 export default function HomePage() {
     const [allActive, setAllActive] = useState(true);
-    const [activeTags, setActiveTags] = useState<string[]>([]);
-    const [activeTag, setActiveTag] = useState("");
-    const [allActive, setAllActive] = useState(true);
-    // const [activeTags, setActiveTags] = useState<string[]>([]);
     const [activeTag, setActiveTag] = useState("");
 
-    const handleTagClick = (tagName: string) => {
-        if (activeTag === tagName) {
-            setActiveTag("");
-        } else {
-            setActiveTag(tagName);
-        }
-    };
-    // const handleTagClick = (tagName: string) => {
-    //     if (activeTags.includes(tagName)) {
-    //         setActiveTags(activeTags.filter((item) => item !== tagName));
-    //     } else {
-    //         setActiveTags([...activeTags, tagName]);
-    //     }
-    // };
     const handleTagClick = (tagName: string) => {
         if (activeTag === tagName) {
             setActiveTag("");
@@ -48,13 +30,7 @@ export default function HomePage() {
             setAllActive(false);
         }
     }, [activeTag]);
-    // useEffect(() => {
-    //     if (activeTags.length > 0) {
-    //         setAllActive(false);
-    //     } else {
-    //         setAllActive(true);
-    //     }
-    // }, [activeTags]);
+
     useEffect(() => {
         if (activeTag === "") {
             setAllActive(true);
