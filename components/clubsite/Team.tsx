@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { execs, leads, team } from "@/lib/data";
+import { execs, team } from "@/lib/data";
 
 import akuna from "@/assets/logos/akuna.png";
 import bloomberg from "@/assets/logos/bloomberg.png";
@@ -32,28 +32,6 @@ const Team = () => {
                   </div>
                   <div className="text-sm text-neutral-200 px-2">
                     {exec.role}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-          <div className="hidden sm:flex sm:basis-full"></div>
-          {leads.map((lead) => (
-            <div className="memberCard execCard w-[calc((100%-12px)/2)] sm:w-[calc((100%-48px)/5)] h-48 rounded-lg bg-[#333333] col-span-2">
-              <div className="memberCardBorder"></div>
-              <div className="memberCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] rounded-lg bg-black flex flex-col">
-                <Image
-                  src={lead.image}
-                  alt="placeholder"
-                  fill={true}
-                  className="teamPic object-cover overflow-hidden rounded-lg opacity-30 z-0"
-                />
-                <div className="mt-[calc(70%)] sm:mt-[calc(60%)] text-center leading-3 z-10">
-                  <div className="text-neutral-50 text-xl sm:text-2xl font-bold px-1">
-                    {lead.name}
-                  </div>
-                  <div className="text-sm text-neutral-200 px-2">
-                    {lead.role}
                   </div>
                 </div>
               </div>
