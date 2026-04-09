@@ -93,35 +93,48 @@ export const projects = [
         description:
             "Using fluctuations in the price of a stock to generate profits over time.",
         image: mean,
+        href: "",
     },
     {
         name: "Sentiment Analysis",
         description:
             "Using fluctuations in the price of a stock to generate profits over time.",
         image: sentiment,
+        href: "",
     },
     {
         name: "Crypto Arbitrage",
         description:
             "Analyzing opportunities for arbitrage across various exchanges.",
         image: crypto,
+        href: "",
+    },
+    {
+        name: "Correlation Testing",
+        description:
+            "Analyzing lagged correlations and statistical trading signals between stock pairs.",
+        image: sentiment,
+        href: "/correlation-testing",
     },
     {
         name: "LLM Research",
         description:
             "In-house LLM to assist quant devs with training models, research, etc.",
         image: llm,
+        href: "",
     },
     {
         name: "Backtesting Platform",
         description:
             "A way to test our models on the market and assess performance.",
         image: backtesting,
+        href: "",
     },
     {
         name: "ML Platform",
         description:
             "A place for devs to securely utilize hardware to train models for free!",
         image: ml,
+        href: "",
     },
 ] as const;
