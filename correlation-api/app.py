@@ -5,6 +5,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 
+import yfinance as yf
+
 from analysis.data_loader import load_pair_data
 from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
@@ -45,6 +47,20 @@ def _safe_float(val):
 @app.route("/api/pairs", methods=["GET"])
 def get_pairs():
     return jsonify(PAIRS)
+
+
+@app.route("/api/validate", methods=["GET"])
+def validate_ticker():
+    ticker = request.args.get("ticker", "").upper()
+    if not ticker:
+        return jsonify({"valid": False, "error": "No ticker provided"}), 400
+    try:
+        info = yf.Ticker(ticker).info
+        valid = info.get("regularMarketPrice") is not None or info.get("previousClose") is not None
+        name = info.get("shortName", ticker)
+        return jsonify({"valid": valid, "ticker": ticker, "name": name if valid else None})
+    except Exception:
+        return jsonify({"valid": False, "ticker": ticker, "name": None})
 
 
 @app.route("/api/correlation", methods=["GET"])

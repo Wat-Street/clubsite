@@ -14,30 +14,60 @@ interface PairSelectorProps {
   onSelect: (pair: PairInfo) => void;
   selectedPair: PairInfo | null;
   pairSignals: Record<string, SignalLevel>;
+  onError: (message: string) => void;
 }
 
 export default function PairSelector({
   onSelect,
   selectedPair,
   pairSignals,
+  onError,
 }: PairSelectorProps) {
   const [customA, setCustomA] = useState("");
   const [customB, setCustomB] = useState("");
+  const [validating, setValidating] = useState(false);
 
   const isSelected = (p: PairInfo) =>
     selectedPair?.ticker_a === p.ticker_a && selectedPair?.ticker_b === p.ticker_b;
 
-  const handleCustomAnalyze = () => {
+  const handleCustomAnalyze = async () => {
     const a = customA.trim().toUpperCase();
     const b = customB.trim().toUpperCase();
-    if (a && b && a !== b) {
+    if (!a || !b || a === b) return;
+
+    setValidating(true);
+    try {
+      const [resA, resB] = await Promise.all([
+        fetch(`/api/validate?ticker=${a}`),
+        fetch(`/api/validate?ticker=${b}`),
+      ]);
+      const dataA = await resA.json();
+      const dataB = await resB.json();
+
+      const invalid: string[] = [];
+      if (!dataA.valid) invalid.push(a);
+      if (!dataB.valid) invalid.push(b);
+
+      if (invalid.length > 0) {
+        onError(
+          invalid.length === 2
+            ? `"${invalid[0]}" and "${invalid[1]}" are not valid ticker symbols`
+            : `"${invalid[0]}" is not a valid ticker symbol`
+        );
+        return;
+      }
+
       onSelect({
         ticker_a: a,
         ticker_b: b,
-        name_a: a,
-        name_b: b,
+        name_a: dataA.name ?? a,
+        name_b: dataB.name ?? b,
         sector: "Custom",
       });
+    } catch {
+      onError("Could not validate tickers. Please try again.");
+    } finally {
+      setValidating(false);
     }
   };
 
@@ -137,10 +167,13 @@ export default function PairSelector({
           </div>
           <button
             onClick={handleCustomAnalyze}
-            disabled={!customA.trim() || !customB.trim() || customA.trim() === customB.trim()}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#c28b00] text-black font-semibold text-sm hover:bg-[#d4a020] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            disabled={validating || !customA.trim() || !customB.trim() || customA.trim() === customB.trim()}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#c28b00] text-black font-semibold text-sm hover:bg-[#d4a020] disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
-            Analyze
+            {validating && (
+              <div className="h-3.5 w-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+            )}
+            {validating ? "Validating..." : "Analyze"}
           </button>
         </div>
       </div>
