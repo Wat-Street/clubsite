@@ -10,6 +10,7 @@ import crypto from "@/assets/graphics/Crypto Arbitrage.svg";
 import llm from "@/assets/graphics/LLM.svg";
 import backtesting from "@/assets/graphics/backtesting.png";
 import ml from "@/assets/graphics/ml.svg";
+import correlation from "@/assets/graphics/correlation.svg";
 
 export const execs = [
     {
@@ -113,7 +114,7 @@ export const projects = [
         name: "Correlation Testing",
         description:
             "Analyzing lagged correlations and statistical trading signals between stock pairs.",
-        image: sentiment,
+        image: correlation,
         href: "/correlation-testing",
     },
     {

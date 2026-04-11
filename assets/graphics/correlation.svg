@@ -1,0 +1,47 @@
+<svg width="372" height="249" viewBox="0 0 372 249" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M20 180 C50 160, 70 120, 100 130 C130 140, 140 100, 170 90 C200 80, 210 110, 240 100 C270 90, 280 60, 310 70 C340 80, 350 50, 360 55" stroke="url(#corrGold)" stroke-width="2" stroke-linecap="round" fill="none"/>
+<path d="M20 190 C50 175, 75 135, 105 145 C135 155, 145 115, 175 108 C205 100, 215 125, 245 118 C275 110, 285 78, 315 85 C345 92, 352 68, 360 72" stroke="url(#corrBlue)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.7"/>
+<path d="M20 180 C50 160, 70 120, 100 130 C130 140, 140 100, 170 90 C200 80, 210 110, 240 100 C270 90, 280 60, 310 70 C340 80, 350 50, 360 55 L360 249 L20 249 Z" fill="url(#corrFillGold)"/>
+<circle cx="100" cy="130" r="3.5" fill="#c28b00" opacity="0.9"/>
+<circle cx="170" cy="90" r="3.5" fill="#c28b00" opacity="0.9"/>
+<circle cx="240" cy="100" r="3.5" fill="#c28b00" opacity="0.9"/>
+<circle cx="310" cy="70" r="3.5" fill="#c28b00" opacity="0.9"/>
+<circle cx="105" cy="145" r="3" fill="#60a5fa" opacity="0.7"/>
+<circle cx="175" cy="108" r="3" fill="#60a5fa" opacity="0.7"/>
+<circle cx="245" cy="118" r="3" fill="#60a5fa" opacity="0.7"/>
+<circle cx="315" cy="85" r="3" fill="#60a5fa" opacity="0.7"/>
+<line x1="100" y1="130" x2="105" y2="145" stroke="#979797" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.5"/>
+<line x1="170" y1="90" x2="175" y2="108" stroke="#979797" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.5"/>
+<line x1="240" y1="100" x2="245" y2="118" stroke="#979797" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.5"/>
+<line x1="310" y1="70" x2="315" y2="85" stroke="#979797" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.5"/>
+<rect x="40" y="20" width="90" height="28" rx="14" fill="url(#corrPillBg)" stroke="url(#corrPillStroke)" stroke-width="0.75"/>
+<circle cx="58" cy="34" r="4" fill="#22c55e" opacity="0.8"/>
+<rect x="70" y="30" width="20" height="3" rx="1.5" fill="#c28b00" opacity="0.6"/>
+<rect x="94" y="30" width="28" height="3" rx="1.5" fill="#c28b00" opacity="0.4"/>
+<line x1="20" y1="249" x2="360" y2="249" stroke="#333" stroke-width="0.5"/>
+<line x1="20" y1="200" x2="360" y2="200" stroke="#333" stroke-width="0.5" stroke-dasharray="4 6" opacity="0.3"/>
+<line x1="20" y1="150" x2="360" y2="150" stroke="#333" stroke-width="0.5" stroke-dasharray="4 6" opacity="0.3"/>
+<line x1="20" y1="100" x2="360" y2="100" stroke="#333" stroke-width="0.5" stroke-dasharray="4 6" opacity="0.3"/>
+<defs>
+<linearGradient id="corrGold" x1="20" y1="120" x2="360" y2="120" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFE0A3"/>
+<stop offset="1" stop-color="#c28b00"/>
+</linearGradient>
+<linearGradient id="corrBlue" x1="20" y1="130" x2="360" y2="130" gradientUnits="userSpaceOnUse">
+<stop stop-color="#93c5fd"/>
+<stop offset="1" stop-color="#3b82f6"/>
+</linearGradient>
+<linearGradient id="corrFillGold" x1="190" y1="55" x2="190" y2="249" gradientUnits="userSpaceOnUse">
+<stop stop-color="#c28b00" stop-opacity="0.15"/>
+<stop offset="1" stop-color="#c28b00" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="corrPillBg" x1="40" y1="20" x2="130" y2="48" gradientUnits="userSpaceOnUse">
+<stop stop-color="#c28b00" stop-opacity="0.12"/>
+<stop offset="1" stop-color="#c28b00" stop-opacity="0.04"/>
+</linearGradient>
+<linearGradient id="corrPillStroke" x1="40" y1="20" x2="130" y2="48" gradientUnits="userSpaceOnUse">
+<stop stop-color="#c28b00" stop-opacity="0.4"/>
+<stop offset="1" stop-color="#c28b00" stop-opacity="0.15"/>
+</linearGradient>
+</defs>
+</svg>
