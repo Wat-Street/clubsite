@@ -30,7 +30,7 @@ function yearsAgo(n: number): string {
   return d.toISOString().split("T")[0];
 }
 
-export default function CorrelationTestingPage() {
+export default function CorrelationTradingPage() {
   const [selectedPair, setSelectedPair] = useState<PairInfo | null>(null);
   const [dateRange, setDateRange] = useState({
     start: yearsAgo(3),

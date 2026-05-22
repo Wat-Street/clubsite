@@ -75,7 +75,7 @@ export default function PairSelector({
     <div className="space-y-8">
       <div className="text-center space-y-2">
         <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 tracking-tight">
-          Correlation Testing
+          Correlation Trading
         </h1>
         <p className="text-neutral-400 text-sm sm:text-base max-w-xl mx-auto">
           Analyze lagged correlations, spread dynamics, and statistical trading
