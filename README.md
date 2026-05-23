@@ -79,6 +79,29 @@ clubsite/
 2. Append an entry to the project list in `lib/data.ts`
 3. If it needs a backend, add a sibling directory (e.g. `clubsite/<name>-api/`) and extend `next.config.mjs` with another rewrite rule
 
-## Production notes
+## Deployment
 
-The `/api/*` rewrite targets `http://localhost:5050`, which only works locally. For production, replace the rewrite destination with the deployed API URL (or front the Flask service behind the same domain).
+```
+Browser ──► Netlify (Next.js site)
+                │  /api/* rewrite (next.config.mjs)
+                ▼
+       Render (Flask correlation-api)
+                │
+                ▼
+         Yahoo Finance
+```
+
+- **Frontend** deploys to Netlify from `main` (current site: `watstreet.netlify.app`).
+- **Backend** deploys to Render from `main` via `render.yaml`. The service builds from `correlation-api/`, installs `requirements.txt`, and runs `gunicorn`.
+- The rewrite destination is parameterised: `next.config.mjs` reads `CORRELATION_API_URL` and falls back to `http://localhost:5050` for local dev.
+
+### First-time setup
+
+1. **Render** — In the Render dashboard, create a new Blueprint from this repo. It picks up `render.yaml` and provisions the `correlation-api` service automatically. Copy the resulting URL (e.g. `https://correlation-api-xxxx.onrender.com`).
+2. **Netlify** — Add an environment variable `CORRELATION_API_URL` set to the Render URL above, then trigger a redeploy. The Next rewrite now proxies `/api/*` to Render.
+
+### Notes
+
+- Render's free tier spins down after 15 min of inactivity. First request after a cold start takes ~30s.
+- After any change to `correlation-api/`, Render auto-redeploys on push to `main`.
+- The `/api/*` rewrite is server-side (Netlify proxies to Render), so the browser only ever sees the Netlify domain — no CORS gymnastics needed.
