@@ -1,4 +1,3 @@
-import Header from "@/components/clubsite/Header";
 import Landing from "@/components/clubsite/Landing";
 import About from "@/components/clubsite/About";
 import Projects from "@/components/clubsite/Projects";
@@ -9,7 +8,6 @@ import MousePos from "@/components/clubsite/MousePos";
 export default function HomePage() {
   return (
     <main className="mx-6 sm:mx-0">
-      <Header defaultPage={0} />
       <div className="max-w-4xl mx-auto">
         <div className="h-[calc(100vh-80px)]">
           <Landing />

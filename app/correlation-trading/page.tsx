@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import Header from "@/components/clubsite/Header";
 import Footer from "@/components/clubsite/Footer";
 
 import PairSelector from "@/components/correlation/PairSelector";
@@ -138,8 +137,6 @@ export default function CorrelationTradingPage() {
 
   return (
     <main className="mx-6 sm:mx-0 min-h-screen">
-      <Header defaultPage={-1} />
-
       {toast && (
         <Toast
           message={toast.message}

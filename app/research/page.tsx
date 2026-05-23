@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-import Header from "@/components/clubsite/Header";
 import Footer from "@/components/clubsite/Footer";
 import MousePos from "@/components/clubsite/MousePos";
 import PaperPreview from "@/components/research/PaperPreview";
@@ -41,7 +40,6 @@ export default function HomePage() {
 
     return (
         <main className="mx-6 sm:mx-0 h-screen">
-            <Header defaultPage={3} />
             <div className="py-4 md:pt-8 min-h-[calc(100vh-80px)]">
                 <div className="min-h-8 py-4 flex flex-wrap justify-center gap-1 text-sm text-neutral-50">
                     <button
