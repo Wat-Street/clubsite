@@ -6,7 +6,6 @@ const navLinks = [
     { name: "Projects", href: "/#projects" },
     { name: "Team", href: "/#team" },
     { name: "Research", href: "/research" },
-    // { name: "Contact", href: "#contact" },
 ];
 
 const Navbar = (props: { defaultPage: number }) => {

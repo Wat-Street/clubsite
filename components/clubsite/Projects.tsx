@@ -10,6 +10,32 @@ import Image from "next/image";
 
 import { projects } from "@/lib/data";
 
+function ProjectCard({ project, className }: { project: typeof projects[number]; className?: string }) {
+  const card = (
+    <div className={`projCard w-full h-96 rounded-lg bg-[#333333] overflow-hidden ${className ?? ""}`}>
+      <div className="projCardBorder"></div>
+      <div className="projCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] bg-black rounded-lg relative overflow-hidden">
+        <Image
+          src={project.image}
+          alt={project.name}
+          className="px-2 mt-4 sm:mt-10 w-max h-max"
+        />
+        <div className="mx-8 mb-6 flex flex-col gap-1 absolute bottom-0">
+          <div className="text-2xl font-semibold text-neutral-50">
+            {project.name}
+          </div>
+          <div className="text-neutral-200">{project.description}</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (project.href) {
+    return <a href={project.href} className="block">{card}</a>;
+  }
+  return card;
+}
+
 const Projects = () => {
   return (
     <div className="my-auto projCards">
@@ -19,22 +45,7 @@ const Projects = () => {
       {/* Mobile View */}
       <div className="sm:hidden flex flex-col gap-4">
         {projects.map((project) => (
-          <div className="projCard w-full h-96 rounded-lg bg-[#333333] overflow-hidden">
-            <div className="projCardBorder"></div>
-            <div className="projCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] bg-black rounded-lg relative overflow-hidden">
-              <Image
-                src={project.image}
-                alt={project.name}
-                className="px-2 mt-4 sm:mt-10 w-max h-max"
-              />
-              <div className="mx-8 mb-6 flex flex-col gap-1 absolute bottom-0">
-                <div className="text-2xl font-semibold text-neutral-50">
-                  {project.name}
-                </div>
-                <div className="text-neutral-200">{project.description}</div>
-              </div>
-            </div>
-          </div>
+          <ProjectCard key={project.name} project={project} />
         ))}
       </div>
 
@@ -48,25 +59,8 @@ const Projects = () => {
         >
           <CarouselContent>
             {projects.map((project) => (
-              <CarouselItem className="sm:basis-1/3">
-                <div className="projCard w-full h-96 rounded-lg bg-[#333333] overflow-hidden">
-                  <div className="projCardBorder"></div>
-                  <div className="projCardContent w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1px] bg-black rounded-lg relative overflow-hidden">
-                    <Image
-                      src={project.image}
-                      alt={project.name}
-                      className="px-2 mt-10 w-max h-max"
-                    />
-                    <div className="mx-8 mb-6 flex flex-col gap-1 absolute bottom-0">
-                      <div className="text-2xl font-semibold text-neutral-50">
-                        {project.name}
-                      </div>
-                      <div className="text-neutral-200">
-                        {project.description}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <CarouselItem key={project.name} className="sm:basis-1/3">
+                <ProjectCard project={project} />
               </CarouselItem>
             ))}
           </CarouselContent>

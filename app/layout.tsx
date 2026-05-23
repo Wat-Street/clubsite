@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/themeProvider";
+import FixedHeader from "@/components/clubsite/FixedHeader";
 
 const proxima = localFont({
   src: [
@@ -43,6 +44,7 @@ export default function RootLayout({
           forcedTheme="dark"
           disableTransitionOnChange
         >
+          <FixedHeader />
           {children}
         </ThemeProvider>
       </body>
