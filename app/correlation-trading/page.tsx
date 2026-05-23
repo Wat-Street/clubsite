@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import Header from "@/components/clubsite/Header";
 import Footer from "@/components/clubsite/Footer";
 
 import PairSelector from "@/components/correlation/PairSelector";
@@ -12,6 +11,7 @@ import LagCorrelationChart from "@/components/correlation/LagCorrelationChart";
 import SpreadAnalysisCharts from "@/components/correlation/SpreadAnalysisCharts";
 import MetricsPanel from "@/components/correlation/MetricsPanel";
 import SpreadHistogram from "@/components/correlation/SpreadHistogram";
+import Toast from "@/components/correlation/Toast";
 
 import type {
   PairInfo,
@@ -29,7 +29,7 @@ function yearsAgo(n: number): string {
   return d.toISOString().split("T")[0];
 }
 
-export default function CorrelationTestingPage() {
+export default function CorrelationTradingPage() {
   const [selectedPair, setSelectedPair] = useState<PairInfo | null>(null);
   const [dateRange, setDateRange] = useState({
     start: yearsAgo(3),
@@ -41,6 +41,7 @@ export default function CorrelationTestingPage() {
   const [spreadData, setSpreadData] = useState<SpreadResponse | null>(null);
   const [pairSignals, setPairSignals] = useState<Record<string, SignalLevel>>({});
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   const fetchAnalysis = useCallback(
     async (pair: PairInfo) => {
@@ -60,8 +61,14 @@ export default function CorrelationTestingPage() {
         ]);
 
         if (!corrRes.ok || !spreadRes.ok) {
-          const errBody = await (corrRes.ok ? spreadRes : corrRes).json();
-          throw new Error(errBody.error || "API error");
+          let msg = `Could not load data for ${pair.ticker_a}/${pair.ticker_b}`;
+          try {
+            const errBody = await (corrRes.ok ? spreadRes : corrRes).json();
+            if (errBody.error) msg = errBody.error;
+          } catch {
+            // response wasn't JSON
+          }
+          throw new Error(msg);
         }
 
         const corr: CorrelationResponse = await corrRes.json();
@@ -77,7 +84,9 @@ export default function CorrelationTestingPage() {
           ),
         }));
       } catch (e: any) {
-        setError(e.message ?? "Failed to load data");
+        const msg = e.message ?? "Failed to load data";
+        setError(msg);
+        setToast({ message: msg, type: "error" });
       } finally {
         setLoading(false);
       }
@@ -128,7 +137,13 @@ export default function CorrelationTestingPage() {
 
   return (
     <main className="mx-6 sm:mx-0 min-h-screen">
-      <Header defaultPage={-1} />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 min-h-[calc(100vh-80px)]">
         <AnimatePresence mode="wait">
@@ -144,6 +159,7 @@ export default function CorrelationTestingPage() {
                 onSelect={handleSelect}
                 selectedPair={selectedPair}
                 pairSignals={pairSignals}
+                onError={(msg) => setToast({ message: msg, type: "error" })}
               />
             </motion.div>
           ) : (

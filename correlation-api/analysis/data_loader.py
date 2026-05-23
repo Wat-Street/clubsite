@@ -40,11 +40,17 @@ def get_stock_data(ticker, start_date, end_date, cache=True):
             cached["Close"] = cached["Close"].iloc[:, 0]
         return cached[["Date", "Close", "Ticker"]]
 
-    df = yf.download(ticker, start=start_date, end=end_date)
-    df.reset_index(inplace=True)
+    df = yf.download(ticker, start=start_date, end=end_date, progress=False, auto_adjust=False)
 
+    # Flatten MultiIndex columns — newer yfinance returns them even for single-ticker downloads
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
+
+    # Move the date out of the index. Newer yfinance leaves the index unnamed,
+    # so reset_index can produce a column called "index" rather than "Date".
+    df = df.reset_index()
+    if "Date" not in df.columns:
+        df = df.rename(columns={df.columns[0]: "Date"})
 
     # Deduplicate columns and extract a single Close series
     df = df.loc[:, ~df.columns.duplicated()]

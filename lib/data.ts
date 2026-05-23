@@ -111,11 +111,11 @@ export const projects = [
         href: "",
     },
     {
-        name: "Correlation Testing",
+        name: "Correlation Trading",
         description:
             "Analyzing lagged correlations and statistical trading signals between stock pairs.",
         image: correlation,
-        href: "/correlation-testing",
+        href: "/correlation-trading",
     },
     {
         name: "LLM Research",
