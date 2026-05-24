@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import Header from "@/components/clubsite/Header";
 
 const ROUTE_BANNERS: Record<string, string> = {
-  "/correlation-trading": "Work in progress — data may not be accurate",
+  "/correlation-trading": "Work in progress — data unavailable at this time",
 };
 
 const DEFAULT_PAGES: Record<string, number> = {
