@@ -29,7 +29,7 @@ export default function FixedHeader() {
   const [activeBanner, setActiveBanner] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
-  const storageKey = `banner-dismissed-v2:${pathname}`;
+  const storageKey = `banner-dismissed:${pathname}`;
 
   // Read persisted dismissal whenever the route changes
   useEffect(() => {
