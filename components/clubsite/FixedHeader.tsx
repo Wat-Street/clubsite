@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import Header from "@/components/clubsite/Header";
 
 const ROUTE_BANNERS: Record<string, string> = {
-  "/correlation-trading": "Work in progress — data may not be accurate",
+  "/correlation-trading": "Work in progress — data unavailable at this time",
 };
 
 const DEFAULT_PAGES: Record<string, number> = {
@@ -29,7 +29,7 @@ export default function FixedHeader() {
   const [activeBanner, setActiveBanner] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
-  const storageKey = `banner-dismissed:${pathname}`;
+  const storageKey = `banner-dismissed-v2:${pathname}`;
 
   // Read persisted dismissal whenever the route changes
   useEffect(() => {
