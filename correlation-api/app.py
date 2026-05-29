@@ -10,6 +10,7 @@ import yfinance as yf
 from analysis.data_loader import load_pair_data
 from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
+from analysis.risk import detect_correlation_breakdown
 
 app = Flask(__name__)
 CORS(app)
@@ -134,6 +135,35 @@ def get_spread():
             "spread_type": spread_type,
             "data": data,
             "metrics": clean_metrics,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/risk/breakdown", methods=["GET"])
+def get_risk_breakdown():
+    ticker_a = request.args.get("ticker_a", "").upper()
+    ticker_b = request.args.get("ticker_b", "").upper()
+    start = request.args.get("start", "2015-01-01")
+    end = request.args.get("end", str(date.today()))
+
+    if not ticker_a or not ticker_b:
+        return jsonify({"error": "ticker_a and ticker_b are required"}), 400
+
+    try:
+        df = load_pair_data(ticker_a, ticker_b, start, end)
+        date_index = pd.to_datetime(df["Date"])
+        series_a = pd.Series(df[f"Close_{ticker_a}"].values, index=date_index)
+        series_b = pd.Series(df[f"Close_{ticker_b}"].values, index=date_index)
+        breakdown = detect_correlation_breakdown(series_a, series_b)
+
+        return jsonify({
+            "ticker_a": ticker_a,
+            "ticker_b": ticker_b,
+            "current_corr": _safe_float(breakdown["current_corr"]),
+            "baseline_corr": _safe_float(breakdown["baseline_corr"]),
+            "broken": bool(breakdown["broken"]),
+            "broken_since": breakdown["broken_since"],
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -12,10 +12,12 @@ import SpreadAnalysisCharts from "@/components/correlation/SpreadAnalysisCharts"
 import MetricsPanel from "@/components/correlation/MetricsPanel";
 import SpreadHistogram from "@/components/correlation/SpreadHistogram";
 import Toast from "@/components/correlation/Toast";
+import RiskWarningBanner from "@/components/correlation/RiskWarningBanner";
 
 import type {
   PairInfo,
   CorrelationResponse,
+  RiskBreakdownResponse,
   SpreadResponse,
   SignalLevel,
 } from "@/lib/correlationTypes";
@@ -39,6 +41,7 @@ export default function CorrelationTradingPage() {
   const [loading, setLoading] = useState(false);
   const [corrData, setCorrData] = useState<CorrelationResponse | null>(null);
   const [spreadData, setSpreadData] = useState<SpreadResponse | null>(null);
+  const [riskData, setRiskData] = useState<RiskBreakdownResponse | null>(null);
   const [pairSignals, setPairSignals] = useState<Record<string, SignalLevel>>({});
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
@@ -49,14 +52,18 @@ export default function CorrelationTradingPage() {
       setError(null);
       setCorrData(null);
       setSpreadData(null);
+      setRiskData(null);
 
       try {
-        const [corrRes, spreadRes] = await Promise.all([
+        const [corrRes, spreadRes, riskRes] = await Promise.all([
           fetch(
             `${API_BASE}/correlation?ticker_a=${pair.ticker_a}&ticker_b=${pair.ticker_b}&start=${dateRange.start}&end=${dateRange.end}`
           ),
           fetch(
             `${API_BASE}/spread?ticker_a=${pair.ticker_a}&ticker_b=${pair.ticker_b}&start=${dateRange.start}&end=${dateRange.end}&spread_type=${spreadType}`
+          ),
+          fetch(
+            `${API_BASE}/risk/breakdown?ticker_a=${pair.ticker_a}&ticker_b=${pair.ticker_b}&start=${dateRange.start}&end=${dateRange.end}`
           ),
         ]);
 
@@ -73,9 +80,13 @@ export default function CorrelationTradingPage() {
 
         const corr: CorrelationResponse = await corrRes.json();
         const spread: SpreadResponse = await spreadRes.json();
+        const risk: RiskBreakdownResponse | null = riskRes.ok
+          ? await riskRes.json()
+          : null;
 
         setCorrData(corr);
         setSpreadData(spread);
+        setRiskData(risk);
 
         setPairSignals((prev) => ({
           ...prev,
@@ -132,6 +143,7 @@ export default function CorrelationTradingPage() {
     setSelectedPair(null);
     setCorrData(null);
     setSpreadData(null);
+    setRiskData(null);
     setError(null);
   };
 
@@ -197,6 +209,8 @@ export default function CorrelationTradingPage() {
 
               {spreadData && (
                 <div className="mt-6 space-y-6">
+                  {riskData?.broken && <RiskWarningBanner risk={riskData} />}
+
                   <MetricsPanel metrics={spreadData.metrics} />
 
                   {corrData && (
