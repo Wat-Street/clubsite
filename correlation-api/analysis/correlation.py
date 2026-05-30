@@ -13,6 +13,8 @@ def compute_lagged_correlation(series_a: pd.Series, series_b: pd.Series, max_lag
     # Drop the first row if it contains the ticker name (non-numeric)
     def clean_series(s: pd.Series) -> pd.Series:
         s_clean = s.copy()
+        if len(s_clean) == 0:
+            return s_clean
         if not pd.api.types.is_numeric_dtype(s_clean.iloc[0]):
             s_clean = s_clean.iloc[1:]
         s_numeric = pd.to_numeric(s_clean, errors='coerce')
