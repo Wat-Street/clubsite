@@ -5,6 +5,7 @@ import pandas as pd
 
 ABSOLUTE_CORRELATION_FLOOR = 0.5
 MIN_BASELINE_OBSERVATIONS = 60
+MIN_POSITIVE_BASELINE_CORRELATION = 0.1
 
 
 def _clean_series(series: pd.Series) -> pd.Series:
@@ -40,7 +41,8 @@ def detect_correlation_breakdown(
     The detector compares the latest recent-window correlation with the
     trailing baseline mean of those recent-window correlations. The baseline is
     shifted by one row so the current correlation does not dilute its own
-    comparison point.
+    comparison point. It only evaluates breakdowns when the baseline indicates
+    an established positive relationship.
     """
     if recent_window < 2:
         raise ValueError("recent_window must be at least 2")
@@ -75,9 +77,13 @@ def detect_correlation_breakdown(
     current_baseline = _safe_current(baseline_corr)
 
     valid_comparison = rolling_corr.notna() & baseline_corr.notna()
-    broken_points = valid_comparison & (
-        (rolling_corr < baseline_corr * threshold)
-        | (rolling_corr < ABSOLUTE_CORRELATION_FLOOR)
+    positive_baseline = baseline_corr > MIN_POSITIVE_BASELINE_CORRELATION
+    relative_breakdown = rolling_corr < baseline_corr * threshold
+    absolute_breakdown = rolling_corr < ABSOLUTE_CORRELATION_FLOOR
+    broken_points = (
+        valid_comparison
+        & positive_baseline
+        & (relative_breakdown | absolute_breakdown)
     )
 
     broken = bool(broken_points.iloc[-1]) if not broken_points.empty else False
