@@ -24,7 +24,7 @@ The Next dev server (`npm run dev` in the repo root) rewrites browser requests f
 | GET | `/api/validate` | `ticker` | `{valid, ticker, name}` — used to validate custom ticker input |
 | GET | `/api/correlation` | `ticker_a`, `ticker_b`, `start`, `end`, `max_lag` | Lagged Pearson correlation across `[-max_lag, +max_lag]` |
 | GET | `/api/spread` | `ticker_a`, `ticker_b`, `start`, `end`, `spread_type` | Spread series, z-score, and metrics for the pair |
-| GET | `/api/risk/breakdown` | `ticker_a`, `ticker_b`, optional `start`, `end` | Correlation-breakdown risk signal with current 60d correlation, 1y baseline, and `broken_since` |
+| GET | `/api/risk/breakdown` | `ticker_a`, `ticker_b`, optional `end`, optional `start` override | Correlation-breakdown risk signal with its own lookback window, current 60d correlation, 1y baseline, and `broken_since` |
 
 Dates are `YYYY-MM-DD`. `spread_type` is one of the values supported by `analysis/spread.py` (default `log_ratio`).
 
