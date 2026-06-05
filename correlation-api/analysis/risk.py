@@ -2,17 +2,12 @@ from typing import Optional
 
 import pandas as pd
 
+from analysis.util import clean_series
+
 
 ABSOLUTE_CORRELATION_FLOOR = 0.5
 MIN_BASELINE_OBSERVATIONS = 60
 MIN_POSITIVE_BASELINE_CORRELATION = 0.1
-
-
-def _clean_series(series: pd.Series) -> pd.Series:
-    cleaned = pd.to_numeric(series.copy(), errors="coerce")
-    if not isinstance(cleaned, pd.Series):
-        cleaned = pd.Series(cleaned, index=series.index)
-    return cleaned
 
 
 def _iso_date(index_value) -> str:
@@ -52,7 +47,7 @@ def detect_correlation_breakdown(
         raise ValueError("threshold must be positive")
 
     aligned = pd.concat(
-        [_clean_series(series_a).rename("a"), _clean_series(series_b).rename("b")],
+        [clean_series(series_a).rename("a"), clean_series(series_b).rename("b")],
         axis=1,
         join="inner",
     ).dropna()
