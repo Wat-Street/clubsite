@@ -10,6 +10,7 @@ import yfinance as yf
 from analysis.data_loader import load_pair_data
 from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
+from analysis.screener import screen_sector, SECTOR_TICKERS
 
 app = Flask(__name__)
 CORS(app)
@@ -137,7 +138,29 @@ def get_spread():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/screener", methods=["GET"])
+def get_screener():
+    sector = request.args.get("sector", "").lower().strip()
+    if not sector:
+        return jsonify({"error": "Missing required param: sector"}), 400
+    if sector not in SECTOR_TICKERS:
+        return jsonify({"error": f"Unknown sector '{sector}'.", "available_sectors": sorted(SECTOR_TICKERS.keys())}), 400
 
+    try:
+        min_corr = float(request.args.get("min_corr", 0.70))
+    except ValueError:
+        return jsonify({"error": "min_corr must be a float between 0 and 1."}), 400
+
+    start = request.args.get("start", "2024-01-01")
+    end = request.args.get("end", str(date.today()))
+
+    try:
+        pairs = screen_sector(SECTOR_TICKERS[sector], start, end, min_corr=min_corr)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"sector": sector, "min_corr": min_corr, "pairs": pairs})
 
 if __name__ == "__main__":
     port = int(os.environ.get("CORRELATION_API_PORT", 5050))
