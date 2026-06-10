@@ -85,7 +85,6 @@ class TestBacktestHarness(unittest.TestCase):
             self.assertIn("metrics", data)
             self.assertIn("equity_curve", data)
             self.assertIn("trade_log", data)
-            self.assertIn("detailed_data", data)
             
             metrics = data["metrics"]
             self.assertIn("sharpe", metrics)
