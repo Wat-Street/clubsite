@@ -195,10 +195,10 @@ def get_backtest():
         return jsonify({"error": "ticker_a and ticker_b are required"}), 400
 
     try:
-        window = int(request.args.get("window", "20"))
-        entry_z = float(request.args.get("entry_z", "2.0"))
-        exit_z = float(request.args.get("exit_z", "0.0"))
-        hedge_ratio = float(request.args.get("hedge_ratio", "1.0"))
+        window = int(request.args.get("window", "20")) #20 days
+        entry_z = float(request.args.get("entry_z", "2.0")) # spread is wide -> arbitrage!
+        exit_z = float(request.args.get("exit_z", "0.0")) # exit outta there
+        hedge_ratio = float(request.args.get("hedge_ratio", "1.0")) 
     except ValueError:
         return jsonify({"error": "Invalid numerical parameters"}), 400
 
