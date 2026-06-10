@@ -83,7 +83,6 @@ def run_backtest(
     dp_a = p_a.diff().fillna(0.0)
     dp_b = p_b.diff().fillna(0.0)
     
-    # Calculate spread
     spread = p_a - hedge_ratio * p_b
     
     # Capital base is the gross exposure at the start of the daily holding period
@@ -105,7 +104,7 @@ def run_backtest(
     daily_returns = daily_dollar_pnl / prev_exposure
     
     # Calculate cumulative returns (equity curve)
-    cum_returns = daily_returns.cumsum()
+    cum_returns = daily_returns.cumsum() # guys.
     
     # Construct equity curve series
     equity_curve = []
@@ -130,7 +129,6 @@ def run_backtest(
     drawdown = running_max - cum_returns
     max_dd = float(drawdown.max())
     
-    # Identify trades and populate trade log
     trade_log = []
     current_pos = 0
     entry_idx = -1
@@ -144,7 +142,7 @@ def run_backtest(
             # If we were in a position, close it
             if current_pos != 0:
                 exit_idx = i
-                # Calculate trade returns
+
                 ent_date = sigs.index[entry_idx]
                 ex_date = sigs.index[exit_idx]
                 
