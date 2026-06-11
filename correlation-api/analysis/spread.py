@@ -27,7 +27,7 @@ def calculate_log_ratio_spread(series_a: pd.Series, series_b: pd.Series) -> pd.S
     return np.log(ratio)
 
 
-def calculate_zscore(spread: pd.Series, window: int = None) -> pd.Series:
+def calculate_zscore(spread: pd.Series, window: int = 60) -> pd.Series:
     """
     Calculate z-score of the spread.
     
@@ -49,7 +49,7 @@ def calculate_zscore(spread: pd.Series, window: int = None) -> pd.Series:
 
 
 def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str, 
-                             spread_type: str = 'log_ratio') -> Tuple[pd.DataFrame, Dict]:
+                             spread_type: str = 'log_ratio', window: int = 60) -> Tuple[pd.DataFrame, Dict]:
     """
     Calculate spread and basic metrics for a pair of stocks.
     
@@ -80,7 +80,7 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
     else:
         raise ValueError(f"Unknown spread_type: {spread_type}")
     
-    zscore = calculate_zscore(spread, window=None)
+    zscore = calculate_zscore(spread, window=window)
     
     result_df = pd.DataFrame({
         'Date': df['Date'].values,
