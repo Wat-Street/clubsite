@@ -27,7 +27,11 @@ def calculate_log_ratio_spread(series_a: pd.Series, series_b: pd.Series, hedge_r
     return log_a - hedge_ratio * log_b
 
 
+<<<<<<< HEAD
 def calculate_zscore(spread: pd.Series, window: int | None = 60) -> pd.Series:
+=======
+def calculate_zscore(spread: pd.Series, window: int = 60) -> pd.Series:
+>>>>>>> bec9def (fix look-ahead bias: add rolling window to calculate_zscore)
     """
     Calculate z-score of the spread.
     
