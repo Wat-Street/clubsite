@@ -12,6 +12,7 @@ from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
 from analysis.risk import detect_correlation_breakdown
 from analysis.backtest import generate_zscore_signals, run_backtest
+from analysis.cointegration import test_cointegration
 
 app = Flask(__name__)
 CORS(app)
@@ -195,10 +196,10 @@ def get_backtest():
         return jsonify({"error": "ticker_a and ticker_b are required"}), 400
 
     try:
-        window = int(request.args.get("window", "20"))  # 20-day rolling window
-        entry_z = float(request.args.get("entry_z", "2.0"))  # z-score entry threshold
-        exit_z = float(request.args.get("exit_z", "0.0"))  # z-score exit threshold
-        hedge_ratio = float(request.args.get("hedge_ratio", "1.0")) 
+        window = int(request.args.get("window", "20"))
+        entry_z = float(request.args.get("entry_z", "2.0"))
+        exit_z = float(request.args.get("exit_z", "0.0"))
+        hedge_ratio = float(request.args.get("hedge_ratio", "1.0"))
     except ValueError:
         return jsonify({"error": "Invalid numerical parameters"}), 400
 
@@ -208,14 +209,12 @@ def get_backtest():
             return jsonify({"error": "No data found for the given tickers and date range"}), 400
 
         spread_df, _ = calculate_spread_metrics(df, ticker_a, ticker_b, spread_type, hedge_ratio)
-        
         spread_df = spread_df.set_index(pd.to_datetime(spread_df["Date"]))
 
         prices_a = spread_df[f"{ticker_a}_price"]
         prices_b = spread_df[f"{ticker_b}_price"]
         spread_series = spread_df["spread"]
 
-        # Generate rolling z-score and walk-forward signals
         signals, rolling_zscore = generate_zscore_signals(
             spread_series,
             window=window,
@@ -223,7 +222,6 @@ def get_backtest():
             exit_z=exit_z
         )
 
-        # Run backtest
         results = run_backtest(prices_a, prices_b, signals, hedge_ratio)
 
         tearsheet = {
@@ -245,6 +243,33 @@ def get_backtest():
         }
 
         return jsonify(tearsheet)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/cointegration", methods=["GET"])
+def get_cointegration():
+    ticker_a = request.args.get("ticker_a", "").upper()
+    ticker_b = request.args.get("ticker_b", "").upper()
+    start = request.args.get("start", "2020-01-01")
+    end = request.args.get("end", str(date.today()))
+
+    if not ticker_a or not ticker_b:
+        return jsonify({"error": "ticker_a and ticker_b are required"}), 400
+
+    try:
+        df = load_pair_data(ticker_a, ticker_b, start, end)
+        series_a = df[f"Close_{ticker_a}"]
+        series_b = df[f"Close_{ticker_b}"]
+        result = test_cointegration(series_a, series_b)
+
+        return jsonify({
+            "ticker_a": ticker_a,
+            "ticker_b": ticker_b,
+            **result,
+        })
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
