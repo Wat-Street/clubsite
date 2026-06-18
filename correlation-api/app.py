@@ -10,6 +10,8 @@ import yfinance as yf
 from analysis.data_loader import load_pair_data
 from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
+from analysis.cointegration import test_cointegration
+
 
 app = Flask(__name__)
 CORS(app)
@@ -134,6 +136,31 @@ def get_spread():
             "spread_type": spread_type,
             "data": data,
             "metrics": clean_metrics,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/cointegration", methods=["GET"])
+def get_cointegration():
+    ticker_a = request.args.get("ticker_a", "").upper()
+    ticker_b = request.args.get("ticker_b", "").upper()
+    start = request.args.get("start", "2020-01-01")
+    end = request.args.get("end", str(date.today()))
+
+    if not ticker_a or not ticker_b:
+        return jsonify({"error": "ticker_a and ticker_b are required"}), 400
+
+    try:
+        df = load_pair_data(ticker_a, ticker_b, start, end)
+        series_a = df[f"Close_{ticker_a}"]
+        series_b = df[f"Close_{ticker_b}"]
+        result = test_cointegration(series_a, series_b)
+
+        return jsonify({
+            "ticker_a": ticker_a,
+            "ticker_b": ticker_b,
+            **result,
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
