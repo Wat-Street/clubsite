@@ -1,6 +1,6 @@
 import os
 import math
-from datetime import date
+from datetime import date, datetime, timedelta
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
@@ -10,9 +10,12 @@ import yfinance as yf
 from analysis.data_loader import load_pair_data
 from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
+from analysis.risk import detect_correlation_breakdown
 
 app = Flask(__name__)
 CORS(app)
+
+RISK_LOOKBACK_DAYS = 540
 
 PAIRS = [
     {"ticker_a": "MSFT",  "ticker_b": "GOOGL", "name_a": "Microsoft",         "name_b": "Google",            "sector": "Technology"},
@@ -42,6 +45,14 @@ def _safe_float(val):
         return v
     except (TypeError, ValueError):
         return None
+
+
+def _risk_start_date(end_date):
+    try:
+        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError("end must be in YYYY-MM-DD format") from exc
+    return (parsed_end - timedelta(days=RISK_LOOKBACK_DAYS)).isoformat()
 
 
 @app.route("/api/pairs", methods=["GET"])
@@ -135,6 +146,37 @@ def get_spread():
             "data": data,
             "metrics": clean_metrics,
         })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/risk/breakdown", methods=["GET"])
+def get_risk_breakdown():
+    ticker_a = request.args.get("ticker_a", "").upper()
+    ticker_b = request.args.get("ticker_b", "").upper()
+    end = request.args.get("end", str(date.today()))
+
+    if not ticker_a or not ticker_b:
+        return jsonify({"error": "ticker_a and ticker_b are required"}), 400
+
+    try:
+        start = request.args.get("start") or _risk_start_date(end)
+        df = load_pair_data(ticker_a, ticker_b, start, end)
+        date_index = pd.to_datetime(df["Date"])
+        series_a = pd.Series(df[f"Close_{ticker_a}"].values, index=date_index)
+        series_b = pd.Series(df[f"Close_{ticker_b}"].values, index=date_index)
+        breakdown = detect_correlation_breakdown(series_a, series_b)
+
+        return jsonify({
+            "ticker_a": ticker_a,
+            "ticker_b": ticker_b,
+            "current_corr": _safe_float(breakdown["current_corr"]),
+            "baseline_corr": _safe_float(breakdown["baseline_corr"]),
+            "broken": bool(breakdown["broken"]),
+            "broken_since": breakdown["broken_since"],
+        })
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -48,6 +48,15 @@ export interface SpreadResponse {
   metrics: SpreadMetrics;
 }
 
+export interface RiskBreakdownResponse {
+  ticker_a: string;
+  ticker_b: string;
+  current_corr: number | null;
+  baseline_corr: number | null;
+  broken: boolean;
+  broken_since: string | null;
+}
+
 export type SignalLevel = "normal" | "watch" | "signal";
 export type SignalDirection = "long" | "short" | "hold";
 

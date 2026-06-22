@@ -1,5 +1,8 @@
 import pandas as pd
 
+from analysis.util import clean_series
+
+
 def compute_lagged_correlation(series_a: pd.Series, series_b: pd.Series, max_lag: int) -> pd.DataFrame:
     """
     Compute lagged correlation between two series.
@@ -10,16 +13,6 @@ def compute_lagged_correlation(series_a: pd.Series, series_b: pd.Series, max_lag
     Returns:
         pd.DataFrame: DataFrame with columns 'Lag' and 'Correlation'.
     """
-    # Drop the first row if it contains the ticker name (non-numeric)
-    def clean_series(s: pd.Series) -> pd.Series:
-        s_clean = s.copy()
-        if not pd.api.types.is_numeric_dtype(s_clean.iloc[0]):
-            s_clean = s_clean.iloc[1:]
-        s_numeric = pd.to_numeric(s_clean, errors='coerce')
-        if not isinstance(s_numeric, pd.Series):
-            s_numeric = pd.Series(s_numeric, index=s_clean.index)
-        return s_numeric
-
     series_a = clean_series(series_a)
     series_b = clean_series(series_b)
 
