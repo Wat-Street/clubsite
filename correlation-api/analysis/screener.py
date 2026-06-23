@@ -53,7 +53,7 @@ def _load_returns(tickers: list[str], start: str, end: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     # Inner join so every column has the same date range
-    returns = pd.DataFrame(frames).dropna()
+    returns = pd.DataFrame(frames)
     return returns
 
 
@@ -99,7 +99,7 @@ def screen_sector(
         corr = float(corr_matrix.loc[ticker_a, ticker_b])
         if np.isnan(corr):
             continue
-        if abs(corr) >= min_corr:
+        if corr >= min_corr:
             results.append({
                 "ticker_a":    ticker_a,
                 "ticker_b":    ticker_b,
