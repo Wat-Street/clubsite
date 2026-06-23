@@ -159,11 +159,12 @@ def get_screener():
         return jsonify({"error": "Missing required param: sector"}), 400
     if sector not in SECTOR_TICKERS:
         return jsonify({"error": f"Unknown sector '{sector}'.", "available_sectors": sorted(SECTOR_TICKERS.keys())}), 400
-
     try:
         min_corr = float(request.args.get("min_corr", 0.70))
     except ValueError:
         return jsonify({"error": "min_corr must be a float between 0 and 1."}), 400
+    if not (0.0 <= min_corr <= 1.0):
+        return jsonify({"error": "min_corr must be between 0.0 and 1.0."}), 400
 
     start = request.args.get("start", "2024-01-01")
     end = request.args.get("end", str(date.today()))
