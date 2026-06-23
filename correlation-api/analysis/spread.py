@@ -27,7 +27,7 @@ def calculate_log_ratio_spread(series_a: pd.Series, series_b: pd.Series) -> pd.S
     return np.log(ratio)
 
 
-def calculate_zscore(spread: pd.Series, window: int = 60) -> pd.Series:
+def calculate_zscore(spread: pd.Series, window: int | None = 60) -> pd.Series:
     """
     Calculate z-score of the spread.
     
