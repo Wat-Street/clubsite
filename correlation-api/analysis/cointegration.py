@@ -12,6 +12,9 @@ def test_cointegration(series_a: pd.Series, series_b: pd.Series) -> dict:
     series_b = pd.to_numeric(series_b, errors="coerce").dropna()
     series_a, series_b = series_a.align(series_b, join="inner")
 
+    if len(series_a) < 30:
+        raise ValueError(f"Not enough overlapping data points ({len(series_a)}) — need at least 30. Try widening the date range.")
+
     test_stat, p_value, _ = coint(series_a, series_b)
 
     return {
