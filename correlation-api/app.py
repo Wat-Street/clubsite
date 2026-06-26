@@ -37,6 +37,14 @@ PAIRS = [
 ]
 
 
+def _risk_start_date(end_date):
+    try:
+        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError("end must be in YYYY-MM-DD format") from exc
+    return (parsed_end - timedelta(days=RISK_LOOKBACK_DAYS)).isoformat()
+
+
 def _safe_float(val):
     try:
         if pd.isna(val):
@@ -47,14 +55,6 @@ def _safe_float(val):
         return v
     except (TypeError, ValueError):
         return None
-
-
-def _risk_start_date(end_date):
-    try:
-        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
-    except ValueError as exc:
-        raise ValueError("end must be in YYYY-MM-DD format") from exc
-    return (parsed_end - timedelta(days=RISK_LOOKBACK_DAYS)).isoformat()
 
 
 @app.route("/api/pairs", methods=["GET"])
@@ -184,6 +184,7 @@ def get_risk_breakdown():
         return jsonify({"error": str(e)}), 500
 
 
+<<<<<<< HEAD
 @app.route("/api/backtest", methods=["GET"])
 def get_backtest():
     ticker_a = request.args.get("ticker_a", "").upper()
@@ -247,6 +248,8 @@ def get_backtest():
         return jsonify({"error": str(e)}), 500
 
 
+=======
+>>>>>>> ee2ee2d (Resolve merge conflict with main, add risk breakdown files)
 @app.route("/api/cointegration", methods=["GET"])
 def get_cointegration():
     ticker_a = request.args.get("ticker_a", "").upper()
