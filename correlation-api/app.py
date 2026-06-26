@@ -57,6 +57,14 @@ def _safe_float(val):
         return None
 
 
+def _risk_start_date(end_date):
+    try:
+        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError("end must be in YYYY-MM-DD format") from exc
+    return (parsed_end - timedelta(days=RISK_LOOKBACK_DAYS)).isoformat()
+
+
 @app.route("/api/pairs", methods=["GET"])
 def get_pairs():
     return jsonify(PAIRS)
