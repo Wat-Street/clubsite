@@ -11,6 +11,8 @@ from analysis.data_loader import load_pair_data
 from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
 from analysis.risk import detect_correlation_breakdown
+from analysis.cointegration import test_cointegration
+
 
 app = Flask(__name__)
 CORS(app)
@@ -18,21 +20,30 @@ CORS(app)
 RISK_LOOKBACK_DAYS = 540
 
 PAIRS = [
-    {"ticker_a": "MSFT",  "ticker_b": "GOOGL", "name_a": "Microsoft",         "name_b": "Google",            "sector": "Technology"},
-    {"ticker_a": "AMD",   "ticker_b": "NVDA",  "name_a": "AMD",               "name_b": "NVIDIA",            "sector": "Technology"},
-    {"ticker_a": "CVS",   "ticker_b": "JNJ",   "name_a": "CVS Health",        "name_b": "Johnson & Johnson", "sector": "Healthcare"},
-    {"ticker_a": "PFE",   "ticker_b": "MRK",   "name_a": "Pfizer",            "name_b": "Merck",             "sector": "Healthcare"},
-    {"ticker_a": "CL",    "ticker_b": "KMB",   "name_a": "Colgate-Palmolive", "name_b": "Kimberly-Clark",    "sector": "Consumer"},
-    {"ticker_a": "KO",    "ticker_b": "PEP",   "name_a": "Coca-Cola",         "name_b": "PepsiCo",           "sector": "Consumer"},
-    {"ticker_a": "COST",  "ticker_b": "BJ",    "name_a": "Costco",            "name_b": "BJ's Wholesale",    "sector": "Consumer"},
-    {"ticker_a": "GE",    "ticker_b": "BA",    "name_a": "GE Aerospace",      "name_b": "Boeing",            "sector": "Industrials"},
-    {"ticker_a": "V",     "ticker_b": "MA",    "name_a": "Visa",              "name_b": "Mastercard",        "sector": "Financials"},
-    {"ticker_a": "MS",    "ticker_b": "GS",    "name_a": "Morgan Stanley",    "name_b": "Goldman Sachs",     "sector": "Financials"},
-    {"ticker_a": "JPM",   "ticker_b": "BAC",   "name_a": "JPMorgan Chase",    "name_b": "Bank of America",   "sector": "Financials"},
-    {"ticker_a": "XOM",   "ticker_b": "CVX",   "name_a": "ExxonMobil",        "name_b": "Chevron",           "sector": "Energy"},
-    {"ticker_a": "T",     "ticker_b": "VZ",    "name_a": "AT&T",              "name_b": "Verizon",           "sector": "Telecom"},
-    {"ticker_a": "WMT",   "ticker_b": "TGT",   "name_a": "Walmart",           "name_b": "Target",            "sector": "Retail"},
+    # Validated cointegrated pairs (p < 0.05, 2020-present window)
+    {"ticker_a": "STX",  "ticker_b": "WDC",  "name_a": "Seagate Technology",         "name_b": "Western Digital",           "sector": "Technology"},
+    {"ticker_a": "ADI",  "ticker_b": "AMAT", "name_a": "Analog Devices",             "name_b": "Applied Materials",         "sector": "Technology"},
+    {"ticker_a": "WMB",  "ticker_b": "EPD",  "name_a": "Williams Companies",         "name_b": "Enterprise Products",       "sector": "Energy"},
+    {"ticker_a": "PNC",  "ticker_b": "FITB", "name_a": "PNC Financial",              "name_b": "Fifth Third Bancorp",       "sector": "Financials"},
+    {"ticker_a": "GS",   "ticker_b": "BK",   "name_a": "Goldman Sachs",              "name_b": "Bank of New York Mellon",   "sector": "Financials"},
+    {"ticker_a": "MS",   "ticker_b": "BK",   "name_a": "Morgan Stanley",             "name_b": "Bank of New York Mellon",   "sector": "Financials"},
+    {"ticker_a": "TMO",  "ticker_b": "MTD",  "name_a": "Thermo Fisher Scientific",   "name_b": "Mettler-Toledo",            "sector": "Healthcare"},
+    {"ticker_a": "TMO",  "ticker_b": "IQV",  "name_a": "Thermo Fisher Scientific",   "name_b": "IQVIA Holdings",            "sector": "Healthcare"},
+    {"ticker_a": "LLY",  "ticker_b": "AMGN", "name_a": "Eli Lilly",                  "name_b": "Amgen",                     "sector": "Healthcare"},
+    {"ticker_a": "A",    "ticker_b": "IQV",  "name_a": "Agilent Technologies",       "name_b": "IQVIA Holdings",            "sector": "Healthcare"},
+    {"ticker_a": "REG",  "ticker_b": "BRX",  "name_a": "Regency Centers",            "name_b": "Brixmor Property Group",    "sector": "Real Estate"},
+    {"ticker_a": "UDR",  "ticker_b": "CPT",  "name_a": "UDR Inc",                    "name_b": "Camden Property Trust",     "sector": "Real Estate"},
+    {"ticker_a": "UNP",  "ticker_b": "CSX",  "name_a": "Union Pacific",              "name_b": "CSX Corporation",           "sector": "Industrials"},
+    {"ticker_a": "ABNB", "ticker_b": "TRIP", "name_a": "Airbnb",                     "name_b": "Tripadvisor",               "sector": "Consumer"},
 ]
+
+
+def _risk_start_date(end_date):
+    try:
+        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError("end must be in YYYY-MM-DD format") from exc
+    return (parsed_end - timedelta(days=RISK_LOOKBACK_DAYS)).isoformat()
 
 
 def _safe_float(val):
@@ -45,14 +56,6 @@ def _safe_float(val):
         return v
     except (TypeError, ValueError):
         return None
-
-
-def _risk_start_date(end_date):
-    try:
-        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
-    except ValueError as exc:
-        raise ValueError("end must be in YYYY-MM-DD format") from exc
-    return (parsed_end - timedelta(days=RISK_LOOKBACK_DAYS)).isoformat()
 
 
 @app.route("/api/pairs", methods=["GET"])
@@ -178,6 +181,31 @@ def get_risk_breakdown():
         })
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/cointegration", methods=["GET"])
+def get_cointegration():
+    ticker_a = request.args.get("ticker_a", "").upper()
+    ticker_b = request.args.get("ticker_b", "").upper()
+    start = request.args.get("start", "2020-01-01")
+    end = request.args.get("end", str(date.today()))
+
+    if not ticker_a or not ticker_b:
+        return jsonify({"error": "ticker_a and ticker_b are required"}), 400
+
+    try:
+        df = load_pair_data(ticker_a, ticker_b, start, end)
+        series_a = df[f"Close_{ticker_a}"]
+        series_b = df[f"Close_{ticker_b}"]
+        result = test_cointegration(series_a, series_b)
+
+        return jsonify({
+            "ticker_a": ticker_a,
+            "ticker_b": ticker_b,
+            **result,
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
