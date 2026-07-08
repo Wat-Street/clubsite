@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, Tuple
 
 def generate_zscore_signals(
     spread: pd.Series,
@@ -38,10 +38,10 @@ def generate_zscore_signals(
             elif z >= entry_z:
                 current_pos = -1
         elif current_pos == 1:
-            if z >= -exit_z or z >= 0.0:
+            if z >= -exit_z:
                 current_pos = 0
         elif current_pos == -1:
-            if z <= exit_z or z <= 0.0:
+            if z <= exit_z:
                 current_pos = 0
                 
         signals.iloc[i] = current_pos
@@ -100,11 +100,12 @@ def run_backtest(
     daily_dollar_pnl = held_positions * daily_spread_diff
     
     # Daily percentage return relative to gross exposure of the previous day
-    prev_exposure = gross_exposure.shift(1).bfill().fillna(1.0)
+    prev_exposure = gross_exposure.shift(1).bfill().fillna(
+        gross_exposure.iloc[0] if len(gross_exposure) else 1.0)
     daily_returns = daily_dollar_pnl / prev_exposure
     
     # Calculate cumulative returns (equity curve)
-    cum_returns = daily_returns.cumsum() # guys.
+    cum_returns = (1.0 + daily_returns).cumprod().sub(1.0) # guys.
     
     # Construct equity curve series
     equity_curve = []
@@ -124,9 +125,10 @@ def run_backtest(
         sharpe = 0.0
         
     # Calculate Maximum Drawdown
-    # peak-to-trough drop
-    running_max = cum_returns.cummax()
-    drawdown = running_max - cum_returns
+    # peak-to-trough drop (as a fraction of equity (positive))
+    equity = 1.0 + cum_returns
+    running_max = equity.cummax()
+    drawdown = 1.0 - (equity / running_max)
     max_dd = float(drawdown.max())
     
     trade_log = []
@@ -143,7 +145,8 @@ def run_backtest(
             if current_pos != 0:
                 exit_idx = i
 
-                ent_date = sigs.index[entry_idx]
+                ent_hold_idx = min(entry_idx + 1, n - 1)
+                ent_date = sigs.index[ent_hold_idx]
                 ex_date = sigs.index[exit_idx]
                 
                 ent_price_a = float(p_a.iloc[entry_idx])
@@ -186,7 +189,8 @@ def run_backtest(
     # Handle open trade at the end of the series
     if current_pos != 0 and n > 0:
         exit_idx = n - 1
-        ent_date = sigs.index[entry_idx]
+        ent_hold_idx = min(entry_idx + 1, n - 1)
+        ent_date = sigs.index[ent_hold_idx]
         ex_date = sigs.index[exit_idx]
         
         ent_price_a = float(p_a.iloc[entry_idx])

@@ -1,6 +1,6 @@
+import os
 import unittest
 import pandas as pd
-import numpy as np
 import requests
 from analysis.backtest import generate_zscore_signals, run_backtest
 
