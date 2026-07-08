@@ -105,11 +105,11 @@ def run_backtest(
     daily_returns = daily_dollar_pnl / prev_exposure
     
     # Calculate cumulative returns (equity curve)
-    cum_returns = (1.0 + daily_returns).cumprod().sub(1.0) # guys.
+    cumulative_returns = (1.0 + daily_returns).cumprod().sub(1.0)
     
     # Construct equity curve series
     equity_curve = []
-    for date_val, val in cum_returns.items():
+    for date_val, val in cumulative_returns.items():
         date_str = str(date_val.date()) if hasattr(date_val, "date") else str(date_val)
         equity_curve.append({
             "date": date_str,
@@ -126,7 +126,7 @@ def run_backtest(
         
     # Calculate Maximum Drawdown
     # peak-to-trough drop (as a fraction of equity (positive))
-    equity = 1.0 + cum_returns
+    equity = 1.0 + cumulative_returns
     running_max = equity.cummax()
     drawdown = 1.0 - (equity / running_max)
     max_dd = float(drawdown.max())
