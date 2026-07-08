@@ -1,7 +1,6 @@
 import os
 import unittest
 import pandas as pd
-import requests
 from analysis.backtest import generate_zscore_signals, run_backtest
 
 class TestBacktestHarness(unittest.TestCase):
@@ -64,37 +63,45 @@ class TestBacktestHarness(unittest.TestCase):
         self.assertEqual(len(zscore), len(self.spread))
 
     def test_api_integration(self):
-        # Call the live endpoint (since our server is running in the background)
-        url = "http://localhost:5050/api/backtest"
-        params = {
-            "ticker_a": "MSFT",
-            "ticker_b": "GOOGL",
-            "window": 20,
-            "entry_z": 2.0,
-            "exit_z": 0.0,
-            "start": "2023-01-01"
-        }
-        try:
-            resp = requests.get(url, params=params)
-            self.assertEqual(resp.status_code, 200)
-            data = resp.json()
-            
-            # Check fields
-            self.assertEqual(data["ticker_a"], "MSFT")
-            self.assertEqual(data["ticker_b"], "GOOGL")
-            self.assertIn("metrics", data)
-            self.assertIn("equity_curve", data)
-            self.assertIn("trade_log", data)
-            
-            metrics = data["metrics"]
-            self.assertIn("sharpe", metrics)
-            self.assertIn("max_drawdown", metrics)
-            self.assertIn("num_trades", metrics)
-            self.assertIn("win_rate", metrics)
-            
-            print(f"\n[API TEST SUCCESS] Sharpe: {metrics['sharpe']:.4f}, Max DD: {metrics['max_drawdown']:.4f}, Trades: {metrics['num_trades']}, Win Rate: {metrics['win_rate']:.4%}")
-        except requests.exceptions.ConnectionError:
-            self.fail("Flask API server is not running on http://localhost:5050")
+        from unittest.mock import patch
+        from app import app
+        import pandas as pd
+        import numpy as np
+        
+        # Create synthetic DataFrame matching load_pair_data output schema
+        dates = pd.date_range(start="2023-01-01", periods=100)
+        # MSFT oscillates, GOOGL is flat at 100.0 to generate spread fluctuations
+        prices_msft = 100.0 + 5.0 * np.sin(np.arange(100) / 3.0)
+        prices_googl = [100.0] * 100
+        mock_df = pd.DataFrame({
+            "Date": dates,
+            "Close_MSFT": prices_msft,
+            "Ticker_MSFT": ["MSFT"] * 100,
+            "Close_GOOGL": prices_googl,
+            "Ticker_GOOGL": ["GOOGL"] * 100
+        })
+        
+        with patch("app.load_pair_data") as mock_load:
+            mock_load.return_value = mock_df
+            with app.test_client() as client:
+                resp = client.get("/api/backtest?ticker_a=MSFT&ticker_b=GOOGL&window=20&entry_z=1.0&exit_z=0.0")
+                self.assertEqual(resp.status_code, 200)
+                data = resp.get_json()
+                
+                # Check fields
+                self.assertEqual(data["ticker_a"], "MSFT")
+                self.assertEqual(data["ticker_b"], "GOOGL")
+                self.assertIn("metrics", data)
+                self.assertIn("equity_curve", data)
+                self.assertIn("trade_log", data)
+                
+                metrics = data["metrics"]
+                self.assertIn("sharpe", metrics)
+                self.assertIn("max_drawdown", metrics)
+                self.assertIn("num_trades", metrics)
+                self.assertIn("win_rate", metrics)
+                
+                print(f"\n[API MOCK TEST SUCCESS] Sharpe: {metrics['sharpe']:.4f}, Max DD: {metrics['max_drawdown']:.4f}, Trades: {metrics['num_trades']}, Win Rate: {metrics['win_rate']:.4%}")
 
 if __name__ == "__main__":
     unittest.main()
