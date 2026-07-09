@@ -195,9 +195,9 @@ def get_backtest():
         return jsonify({"error": "ticker_a and ticker_b are required"}), 400
 
     try:
-        window = int(request.args.get("window", "20")) #20 days
-        entry_z = float(request.args.get("entry_z", "2.0")) # spread is wide -> arbitrage!
-        exit_z = float(request.args.get("exit_z", "0.0")) # exit outta there
+        window = int(request.args.get("window", "20"))  # 20-day rolling window
+        entry_z = float(request.args.get("entry_z", "2.0"))  # z-score entry threshold
+        exit_z = float(request.args.get("exit_z", "0.0"))  # z-score exit threshold
         hedge_ratio = float(request.args.get("hedge_ratio", "1.0")) 
     except ValueError:
         return jsonify({"error": "Invalid numerical parameters"}), 400
@@ -247,8 +247,6 @@ def get_backtest():
         return jsonify(tearsheet)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 
 
 if __name__ == "__main__":
