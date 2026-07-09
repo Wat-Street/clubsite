@@ -100,7 +100,7 @@ def run_backtest(
     daily_dollar_pnl = held_positions * daily_spread_diff
     
     # Daily percentage return relative to gross exposure of the previous day
-    prev_exposure = gross_exposure.shift(1).bfill().fillna(
+    prev_exposure = gross_exposure.shift(1).fillna(
         gross_exposure.iloc[0] if len(gross_exposure) else 1.0)
     daily_returns = daily_dollar_pnl / prev_exposure
     
@@ -145,8 +145,7 @@ def run_backtest(
             if current_pos != 0:
                 exit_idx = i
 
-                ent_hold_idx = min(entry_idx + 1, n - 1)
-                ent_date = sigs.index[ent_hold_idx]
+                ent_date = sigs.index[entry_idx]
                 ex_date = sigs.index[exit_idx]
                 
                 ent_price_a = float(p_a.iloc[entry_idx])
@@ -189,8 +188,7 @@ def run_backtest(
     # Handle open trade at the end of the series
     if current_pos != 0 and n > 0:
         exit_idx = n - 1
-        ent_hold_idx = min(entry_idx + 1, n - 1)
-        ent_date = sigs.index[ent_hold_idx]
+        ent_date = sigs.index[entry_idx]
         ex_date = sigs.index[exit_idx]
         
         ent_price_a = float(p_a.iloc[entry_idx])
