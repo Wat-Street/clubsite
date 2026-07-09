@@ -23,6 +23,21 @@ SECTOR_TICKERS: dict[str, list[str]] = {
         "AMD",  "INTC", "AVGO", "QCOM", "TXN",
         "ORCL", "CRM",  "ADBE", "NOW",  "SNOW",
     ],
+    "healthcare": [
+        "JNJ", "UNH", "PFE", "MRK", "ABT",
+        "TMO", "DHR", "BMY", "AMGN", "LLY",
+        "MDT", "ISRG", "VRTX", "IQV", "MTD",
+    ],
+    "financials": [
+        "JPM", "BAC", "WFC", "GS", "MS",
+        "BLK", "SCHW", "AXP", "BK", "PNC",
+        "USB", "TFC", "FITB", "COF", "MTB",
+    ],
+    "energy": [
+        "XOM", "CVX", "COP", "EOG", "SLB",
+        "MPC", "PSX", "VLO", "WMB", "EPD",
+        "OKE", "KMI", "HAL", "BKR", "DVN",
+    ],
 }
 
 
