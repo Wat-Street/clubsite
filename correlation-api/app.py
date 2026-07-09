@@ -20,22 +20,31 @@ CORS(app)
 RISK_LOOKBACK_DAYS = 540
 
 PAIRS = [
-    {"ticker_a": "MSFT",  "ticker_b": "GOOGL", "name_a": "Microsoft",         "name_b": "Google",            "sector": "Technology"},
-    {"ticker_a": "AMD",   "ticker_b": "NVDA",  "name_a": "AMD",               "name_b": "NVIDIA",            "sector": "Technology"},
-    {"ticker_a": "CVS",   "ticker_b": "JNJ",   "name_a": "CVS Health",        "name_b": "Johnson & Johnson", "sector": "Healthcare"},
-    {"ticker_a": "PFE",   "ticker_b": "MRK",   "name_a": "Pfizer",            "name_b": "Merck",             "sector": "Healthcare"},
-    {"ticker_a": "CL",    "ticker_b": "KMB",   "name_a": "Colgate-Palmolive", "name_b": "Kimberly-Clark",    "sector": "Consumer"},
-    {"ticker_a": "KO",    "ticker_b": "PEP",   "name_a": "Coca-Cola",         "name_b": "PepsiCo",           "sector": "Consumer"},
-    {"ticker_a": "COST",  "ticker_b": "BJ",    "name_a": "Costco",            "name_b": "BJ's Wholesale",    "sector": "Consumer"},
-    {"ticker_a": "GE",    "ticker_b": "BA",    "name_a": "GE Aerospace",      "name_b": "Boeing",            "sector": "Industrials"},
-    {"ticker_a": "V",     "ticker_b": "MA",    "name_a": "Visa",              "name_b": "Mastercard",        "sector": "Financials"},
-    {"ticker_a": "MS",    "ticker_b": "GS",    "name_a": "Morgan Stanley",    "name_b": "Goldman Sachs",     "sector": "Financials"},
-    {"ticker_a": "JPM",   "ticker_b": "BAC",   "name_a": "JPMorgan Chase",    "name_b": "Bank of America",   "sector": "Financials"},
-    {"ticker_a": "XOM",   "ticker_b": "CVX",   "name_a": "ExxonMobil",        "name_b": "Chevron",           "sector": "Energy"},
-    {"ticker_a": "T",     "ticker_b": "VZ",    "name_a": "AT&T",              "name_b": "Verizon",           "sector": "Telecom"},
-    {"ticker_a": "WMT",   "ticker_b": "TGT",   "name_a": "Walmart",           "name_b": "Target",            "sector": "Retail"},
-]
+    # Technology
+    # (no pairs passed cointegration in tech sector, 2020-present window)
 
+    # Healthcare
+    {"ticker_a": "DHR",  "ticker_b": "IQV",  "name_a": "Danaher",                "name_b": "IQVIA Holdings",          "sector": "Healthcare"},
+    {"ticker_a": "TMO",  "ticker_b": "MTD",  "name_a": "Thermo Fisher Scientific","name_b": "Mettler-Toledo",          "sector": "Healthcare"},
+    {"ticker_a": "TMO",  "ticker_b": "IQV",  "name_a": "Thermo Fisher Scientific","name_b": "IQVIA Holdings",          "sector": "Healthcare"},
+    {"ticker_a": "IQV",  "ticker_b": "MTD",  "name_a": "IQVIA Holdings",          "name_b": "Mettler-Toledo",          "sector": "Healthcare"},
+
+    # Financials
+    {"ticker_a": "BLK",  "ticker_b": "COF",  "name_a": "BlackRock",               "name_b": "Capital One",             "sector": "Financials"},
+    {"ticker_a": "WFC",  "ticker_b": "AXP",  "name_a": "Wells Fargo",             "name_b": "American Express",        "sector": "Financials"},
+    {"ticker_a": "PNC",  "ticker_b": "FITB", "name_a": "PNC Financial",           "name_b": "Fifth Third Bancorp",     "sector": "Financials"},
+    {"ticker_a": "GS",   "ticker_b": "BK",   "name_a": "Goldman Sachs",           "name_b": "Bank of New York Mellon", "sector": "Financials"},
+    {"ticker_a": "MS",   "ticker_b": "BK",   "name_a": "Morgan Stanley",          "name_b": "Bank of New York Mellon", "sector": "Financials"},
+    {"ticker_a": "SCHW", "ticker_b": "MTB",  "name_a": "Charles Schwab",          "name_b": "M&T Bank",                "sector": "Financials"},
+
+    # Energy
+    {"ticker_a": "MPC",  "ticker_b": "PSX",  "name_a": "Marathon Petroleum",      "name_b": "Phillips 66",             "sector": "Energy"},
+    {"ticker_a": "EPD",  "ticker_b": "BKR",  "name_a": "Enterprise Products",     "name_b": "Baker Hughes",            "sector": "Energy"},
+    {"ticker_a": "WMB",  "ticker_b": "KMI",  "name_a": "Williams Companies",      "name_b": "Kinder Morgan",           "sector": "Energy"},
+    {"ticker_a": "WMB",  "ticker_b": "EPD",  "name_a": "Williams Companies",      "name_b": "Enterprise Products",     "sector": "Energy"},
+    {"ticker_a": "COP",  "ticker_b": "SLB",  "name_a": "ConocoPhillips",          "name_b": "SLB",                     "sector": "Energy"},
+    {"ticker_a": "MPC",  "ticker_b": "EPD",  "name_a": "Marathon Petroleum",      "name_b": "Enterprise Products",     "sector": "Energy"},
+]
 
 def _safe_float(val):
     try:
