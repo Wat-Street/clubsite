@@ -52,8 +52,9 @@ def _load_returns(tickers: list[str], start: str, end: str) -> pd.DataFrame:
     if not frames:
         return pd.DataFrame()
 
-    # Inner join so every column has the same date range
-    returns = pd.DataFrame(frames)
+    # Inner join on Date — dropna() keeps only rows present across all tickers
+    # so every pair is measured over the same common window
+    returns = pd.DataFrame(frames).dropna()
     return returns
 
 
