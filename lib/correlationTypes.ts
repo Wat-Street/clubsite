@@ -4,6 +4,7 @@ export interface PairInfo {
   name_a: string;
   name_b: string;
   sector: string;
+  category?: "popular" | "tradeable";
 }
 
 export interface CorrelationPoint {
@@ -69,23 +70,40 @@ export const SECTOR_COLORS: Record<string, string> = {
   Energy: "#ef4444",
   Telecom: "#10b981",
   Retail: "#ec4899",
+  "Real Estate": "#f97316",
 };
 
 export const PAIRS: PairInfo[] = [
-  { ticker_a: "MSFT",  ticker_b: "GOOGL", name_a: "Microsoft",         name_b: "Google",            sector: "Technology" },
-  { ticker_a: "AMD",   ticker_b: "NVDA",  name_a: "AMD",               name_b: "NVIDIA",            sector: "Technology" },
-  { ticker_a: "CVS",   ticker_b: "JNJ",   name_a: "CVS Health",        name_b: "Johnson & Johnson", sector: "Healthcare" },
-  { ticker_a: "PFE",   ticker_b: "MRK",   name_a: "Pfizer",            name_b: "Merck",             sector: "Healthcare" },
-  { ticker_a: "CL",    ticker_b: "KMB",   name_a: "Colgate-Palmolive", name_b: "Kimberly-Clark",    sector: "Consumer" },
-  { ticker_a: "KO",    ticker_b: "PEP",   name_a: "Coca-Cola",         name_b: "PepsiCo",           sector: "Consumer" },
-  { ticker_a: "COST",  ticker_b: "BJ",    name_a: "Costco",            name_b: "BJ's Wholesale",    sector: "Consumer" },
-  { ticker_a: "GE",    ticker_b: "BA",    name_a: "GE Aerospace",      name_b: "Boeing",            sector: "Industrials" },
-  { ticker_a: "V",     ticker_b: "MA",    name_a: "Visa",              name_b: "Mastercard",        sector: "Financials" },
-  { ticker_a: "MS",    ticker_b: "GS",    name_a: "Morgan Stanley",    name_b: "Goldman Sachs",     sector: "Financials" },
-  { ticker_a: "JPM",   ticker_b: "BAC",   name_a: "JPMorgan Chase",    name_b: "Bank of America",   sector: "Financials" },
-  { ticker_a: "XOM",   ticker_b: "CVX",   name_a: "ExxonMobil",        name_b: "Chevron",           sector: "Energy" },
-  { ticker_a: "T",     ticker_b: "VZ",    name_a: "AT&T",              name_b: "Verizon",           sector: "Telecom" },
-  { ticker_a: "WMT",   ticker_b: "TGT",   name_a: "Walmart",           name_b: "Target",            sector: "Retail" },
+  // Popular / well-known pairs
+  { ticker_a: "MSFT",  ticker_b: "GOOGL", name_a: "Microsoft",         name_b: "Google",            sector: "Technology", category: "popular" },
+  { ticker_a: "AMD",   ticker_b: "NVDA",  name_a: "AMD",               name_b: "NVIDIA",            sector: "Technology", category: "popular" },
+  { ticker_a: "CVS",   ticker_b: "JNJ",   name_a: "CVS Health",        name_b: "Johnson & Johnson", sector: "Healthcare", category: "popular" },
+  { ticker_a: "PFE",   ticker_b: "MRK",   name_a: "Pfizer",            name_b: "Merck",             sector: "Healthcare", category: "popular" },
+  { ticker_a: "CL",    ticker_b: "KMB",   name_a: "Colgate-Palmolive", name_b: "Kimberly-Clark",    sector: "Consumer",   category: "popular" },
+  { ticker_a: "KO",    ticker_b: "PEP",   name_a: "Coca-Cola",         name_b: "PepsiCo",           sector: "Consumer",   category: "popular" },
+  { ticker_a: "COST",  ticker_b: "BJ",    name_a: "Costco",            name_b: "BJ's Wholesale",    sector: "Retail",     category: "popular" },
+  { ticker_a: "GE",    ticker_b: "BA",    name_a: "GE Aerospace",      name_b: "Boeing",            sector: "Industrials",category: "popular" },
+  { ticker_a: "V",     ticker_b: "MA",    name_a: "Visa",              name_b: "Mastercard",        sector: "Financials", category: "popular" },
+  { ticker_a: "MS",    ticker_b: "GS",    name_a: "Morgan Stanley",    name_b: "Goldman Sachs",     sector: "Financials", category: "popular" },
+  { ticker_a: "JPM",   ticker_b: "BAC",   name_a: "JPMorgan Chase",    name_b: "Bank of America",   sector: "Financials", category: "popular" },
+  { ticker_a: "XOM",   ticker_b: "CVX",   name_a: "ExxonMobil",        name_b: "Chevron",           sector: "Energy",     category: "popular" },
+  { ticker_a: "T",     ticker_b: "VZ",    name_a: "AT&T",              name_b: "Verizon",           sector: "Telecom",    category: "popular" },
+  { ticker_a: "WMT",   ticker_b: "TGT",   name_a: "Walmart",           name_b: "Target",            sector: "Retail",     category: "popular" },
+  // Most tradeable — validated cointegrated pairs (p < 0.05, Engle-Granger, 2020-present)
+  { ticker_a: "STX",  ticker_b: "WDC",  name_a: "Seagate Technology",       name_b: "Western Digital",         sector: "Technology",  category: "tradeable" },
+  { ticker_a: "ADI",  ticker_b: "AMAT", name_a: "Analog Devices",           name_b: "Applied Materials",       sector: "Technology",  category: "tradeable" },
+  { ticker_a: "LLY",  ticker_b: "AMGN", name_a: "Eli Lilly",                name_b: "Amgen",                   sector: "Healthcare",  category: "tradeable" },
+  { ticker_a: "TMO",  ticker_b: "MTD",  name_a: "Thermo Fisher Scientific", name_b: "Mettler-Toledo",          sector: "Healthcare",  category: "tradeable" },
+  { ticker_a: "TMO",  ticker_b: "IQV",  name_a: "Thermo Fisher Scientific", name_b: "IQVIA Holdings",          sector: "Healthcare",  category: "tradeable" },
+  { ticker_a: "A",    ticker_b: "IQV",  name_a: "Agilent Technologies",     name_b: "IQVIA Holdings",          sector: "Healthcare",  category: "tradeable" },
+  { ticker_a: "PNC",  ticker_b: "FITB", name_a: "PNC Financial",            name_b: "Fifth Third Bancorp",     sector: "Financials",  category: "tradeable" },
+  { ticker_a: "GS",   ticker_b: "BK",   name_a: "Goldman Sachs",            name_b: "Bank of New York Mellon", sector: "Financials",  category: "tradeable" },
+  { ticker_a: "MS",   ticker_b: "BK",   name_a: "Morgan Stanley",           name_b: "Bank of New York Mellon", sector: "Financials",  category: "tradeable" },
+  { ticker_a: "WMB",  ticker_b: "EPD",  name_a: "Williams Companies",       name_b: "Enterprise Products",     sector: "Energy",      category: "tradeable" },
+  { ticker_a: "REG",  ticker_b: "BRX",  name_a: "Regency Centers",          name_b: "Brixmor Property Group",  sector: "Real Estate", category: "tradeable" },
+  { ticker_a: "UDR",  ticker_b: "CPT",  name_a: "UDR Inc",                  name_b: "Camden Property Trust",   sector: "Real Estate", category: "tradeable" },
+  { ticker_a: "UNP",  ticker_b: "CSX",  name_a: "Union Pacific",            name_b: "CSX Corporation",         sector: "Industrials", category: "tradeable" },
+  { ticker_a: "ABNB", ticker_b: "TRIP", name_a: "Airbnb",                   name_b: "Tripadvisor",             sector: "Consumer",    category: "tradeable" },
 ];
 
 export function getSignalLevel(zscore: number): SignalLevel {

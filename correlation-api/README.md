@@ -20,11 +20,12 @@ The Next dev server (`npm run dev` in the repo root) rewrites browser requests f
 
 | Method | Path | Query | Returns |
 |--------|------|-------|---------|
-| GET | `/api/pairs` | — | The 14 pre-configured pairs (tickers, names, sector) |
+| GET | `/api/pairs` | — | All 28 pre-configured pairs (tickers, names, sector, category) |
 | GET | `/api/validate` | `ticker` | `{valid, ticker, name}` — used to validate custom ticker input |
 | GET | `/api/correlation` | `ticker_a`, `ticker_b`, `start`, `end`, `max_lag` | Lagged Pearson correlation across `[-max_lag, +max_lag]` |
 | GET | `/api/spread` | `ticker_a`, `ticker_b`, `start`, `end`, `spread_type` | Spread series, z-score, and metrics for the pair |
 | GET | `/api/risk/breakdown` | `ticker_a`, `ticker_b`, optional `end`, optional `start` override | Correlation-breakdown risk signal with its own lookback window, current 60d correlation, 1y baseline, and `broken_since` |
+| GET | `/api/cointegration` | `ticker_a`, `ticker_b`, `start` (default `2020-01-01`), `end` (default today) | Engle-Granger cointegration test: `{test_stat, p_value, is_cointegrated}` |
 
 Dates are `YYYY-MM-DD`. `spread_type` is one of the values supported by `analysis/spread.py` (default `log_ratio`).
 
@@ -53,6 +54,47 @@ correlation-api/
 ## Configuring the pair list
 
 Edit `PAIRS` at the top of `app.py`. Each entry needs `ticker_a`, `ticker_b`, `name_a`, `name_b`, `sector`. The frontend picks these up via `GET /api/pairs`.
+
+## Pair curation methodology
+
+Every pair in the **Most Tradeable** tab must pass an Engle-Granger cointegration test (p < 0.05) on the **2020-01-01 to June 2026** window before being added. The current 14 validated pairs were selected using this process and should be re-run each term:
+
+**Step 1 — Candidate generation**
+
+Run a sector screener across a broad universe of tickers (300+ pairs across 25+ sectors), testing cointegration at multiple time windows (1y / 2y / 3y / 4y / 5y). Pairs that pass more windows are more robust candidates. Record the half-life of mean reversion (shorter = faster spread convergence = more tradeable).
+
+**Step 2 — Validation through the API**
+
+For the top candidates (those passing 3+ windows and half-life < 100 days), run each through our endpoint:
+
+```bash
+curl "http://localhost:5050/api/cointegration?ticker_a=TMO&ticker_b=IQV&start=2020-01-01"
+```
+
+Keep only pairs where `"is_cointegrated": true` (p < 0.05).
+
+**Step 3 — Update `PAIRS`**
+
+Replace the list in `app.py`. Include only validated pairs. Sort by sector for readability.
+
+**Current validated pairs (as of July 2026):**
+
+| Pair | Sector | p-value | Half-life |
+|------|--------|---------|-----------|
+| STX/WDC | Technology | 0.0003 | 71d |
+| ADI/AMAT | Technology | 0.0019 | — |
+| LLY/AMGN | Healthcare | 0.0021 | — |
+| PNC/FITB | Financials | 0.0027 | — |
+| GS/BK | Financials | 0.0034 | — |
+| WMB/EPD | Energy | 0.0037 | 31d |
+| TMO/MTD | Healthcare | 0.0088 | 25d |
+| TMO/IQV | Healthcare | 0.0091 | 17d |
+| REG/BRX | Real Estate | 0.0146 | 23d |
+| UDR/CPT | Real Estate | 0.0188 | 26d |
+| A/IQV | Healthcare | 0.0221 | 29d |
+| MS/BK | Financials | 0.0257 | — |
+| UNP/CSX | Industrials | 0.0404 | — |
+| ABNB/TRIP | Consumer | 0.0468 | 57d |
 
 ## Troubleshooting
 
