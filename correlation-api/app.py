@@ -185,7 +185,6 @@ def get_risk_breakdown():
         return jsonify({"error": str(e)}), 500
 
 
-<<<<<<< HEAD
 @app.route("/api/backtest", methods=["GET"])
 def get_backtest():
     ticker_a = request.args.get("ticker_a", "").upper()
@@ -249,8 +248,6 @@ def get_backtest():
         return jsonify({"error": str(e)}), 500
 
 
-=======
->>>>>>> ee2ee2d (Resolve merge conflict with main, add risk breakdown files)
 @app.route("/api/cointegration", methods=["GET"])
 def get_cointegration():
     ticker_a = request.args.get("ticker_a", "").upper()
