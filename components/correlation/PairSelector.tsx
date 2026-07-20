@@ -23,9 +23,12 @@ export default function PairSelector({
   pairSignals,
   onError,
 }: PairSelectorProps) {
+  const [activeTab, setActiveTab] = useState<"popular" | "tradeable">("popular");
   const [customA, setCustomA] = useState("");
   const [customB, setCustomB] = useState("");
   const [validating, setValidating] = useState(false);
+
+  const visiblePairs = PAIRS.filter((p) => p.category === activeTab);
 
   const isSelected = (p: PairInfo) =>
     selectedPair?.ticker_a === p.ticker_a && selectedPair?.ticker_b === p.ticker_b;
@@ -83,8 +86,31 @@ export default function PairSelector({
         </p>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-2 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] w-fit">
+        {(["popular", "tradeable"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              activeTab === tab
+                ? "bg-[#c28b00] text-black"
+                : "text-neutral-400 hover:text-neutral-200"
+            }`}
+          >
+            {tab === "popular" ? "Popular Pairs" : "Most Tradeable"}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "tradeable" && (
+        <p className="text-xs text-neutral-500 -mt-4 px-1">
+          Validated cointegrated pairs (p &lt; 0.05, Engle-Granger) on the 2020 to June 2026 window.
+        </p>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {PAIRS.map((pair) => {
+        {visiblePairs.map((pair) => {
           const key = `${pair.ticker_a}_${pair.ticker_b}`;
           const signal = pairSignals[key];
           const selected = isSelected(pair);
