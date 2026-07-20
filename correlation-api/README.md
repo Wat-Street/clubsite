@@ -20,7 +20,7 @@ The Next dev server (`npm run dev` in the repo root) rewrites browser requests f
 
 | Method | Path | Query | Returns |
 |--------|------|-------|---------|
-| GET | `/api/pairs` | — | The 14 pre-configured pairs (tickers, names, sector) |
+| GET | `/api/pairs` | — | All 28 pre-configured pairs (tickers, names, sector, category) |
 | GET | `/api/validate` | `ticker` | `{valid, ticker, name}` — used to validate custom ticker input |
 | GET | `/api/correlation` | `ticker_a`, `ticker_b`, `start`, `end`, `max_lag` | Lagged Pearson correlation across `[-max_lag, +max_lag]` |
 | GET | `/api/spread` | `ticker_a`, `ticker_b`, `start`, `end`, `spread_type` | Spread series, z-score, and metrics for the pair |
@@ -57,7 +57,7 @@ Edit `PAIRS` at the top of `app.py`. Each entry needs `ticker_a`, `ticker_b`, `n
 
 ## Pair curation methodology
 
-Every pair in `PAIRS` must pass an Engle-Granger cointegration test (p < 0.05) on the **2020-01-01 to present** window before being added to the list. The current 14 pairs were selected using this process and should be re-run each term:
+Every pair in the **Most Tradeable** tab must pass an Engle-Granger cointegration test (p < 0.05) on the **2020-01-01 to June 2026** window before being added. The current 14 validated pairs were selected using this process and should be re-run each term:
 
 **Step 1 — Candidate generation**
 
