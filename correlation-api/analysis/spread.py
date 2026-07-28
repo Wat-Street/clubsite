@@ -47,6 +47,34 @@ def calculate_zscore(spread: pd.Series, window: int | None = 60) -> pd.Series:
     
     return (spread - mean) / std
 
+from statsmodels.regression.linear_model import OLS
+from statsmodels.tools import add_constant
+
+def estimate_hedge_ratio(series_a: pd.Series, series_b: pd.Series) -> float:
+    """
+    Estimate hedge ratio via OLS regression of A on B.
+    Answers: when B moves $1, A tends to move $beta.
+    Spread is then defined as A - beta * B.
+    """
+    b = add_constant(series_b)
+    result = OLS(series_a, b).fit()
+    return float(result.params.iloc[1])
+
+
+def estimate_rolling_hedge_ratio(series_a: pd.Series, series_b: pd.Series, window: int = 60) -> pd.Series:
+    """
+    Rolling OLS hedge ratio — recalculates beta over a rolling window
+    so it adapts as the relationship between the two stocks drifts.
+    Returns a Series of beta values indexed the same as the inputs.
+    """
+    betas = pd.Series(index=series_a.index, dtype=float)
+    for i in range(window, len(series_a) + 1):
+        a_window = series_a.iloc[i - window:i]
+        b_window = series_b.iloc[i - window:i]
+        b_const = add_constant(b_window)
+        beta = float(OLS(a_window, b_const).fit().params.iloc[1])
+        betas.iloc[i - 1] = beta
+    return betas
 
 def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str, 
                              spread_type: str = 'log_ratio', hedge_ratio: float = 1.0, window: int = 60) -> Tuple[pd.DataFrame, Dict]:
@@ -72,6 +100,8 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
     if isinstance(series_b, pd.DataFrame):
         series_b = pd.Series(series_b.values.flatten(), index=df.index)
     
+    hedge_ratio = estimate_hedge_ratio(series_a, series_b)
+
     if spread_type == 'difference':
         spread = calculate_price_difference_spread(series_a, series_b, hedge_ratio)
     elif spread_type == 'ratio':
@@ -88,7 +118,8 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
         f'{ticker_a}_price': series_a.values,
         f'{ticker_b}_price': series_b.values,
         'spread': spread.values,
-        'zscore': zscore.values
+        'zscore': zscore.values,
+        'hedge_ratio': hedge_ratio
     })
     
     clean_spread = spread.dropna()
@@ -105,6 +136,7 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
         'max': float(clean_spread.max()) if len(clean_spread) > 0 else 0.0,
         'current': float(clean_spread.iloc[-1]) if len(clean_spread) > 0 else 0.0,
         'current_zscore': float(clean_zscore.iloc[-1]) if len(clean_zscore) > 0 else 0.0,
+        'hedge_ratio': hedge_ratio
     }
     
     return result_df, metrics
