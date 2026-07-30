@@ -12,6 +12,7 @@ from analysis.correlation import compute_lagged_correlation
 from analysis.spread import calculate_spread_metrics
 from analysis.risk import detect_correlation_breakdown
 from analysis.backtest import generate_zscore_signals, run_backtest
+from analysis.screener import screen_sector, SECTOR_TICKERS
 
 app = Flask(__name__)
 CORS(app)
@@ -19,22 +20,31 @@ CORS(app)
 RISK_LOOKBACK_DAYS = 540
 
 PAIRS = [
-    {"ticker_a": "MSFT",  "ticker_b": "GOOGL", "name_a": "Microsoft",         "name_b": "Google",            "sector": "Technology"},
-    {"ticker_a": "AMD",   "ticker_b": "NVDA",  "name_a": "AMD",               "name_b": "NVIDIA",            "sector": "Technology"},
-    {"ticker_a": "CVS",   "ticker_b": "JNJ",   "name_a": "CVS Health",        "name_b": "Johnson & Johnson", "sector": "Healthcare"},
-    {"ticker_a": "PFE",   "ticker_b": "MRK",   "name_a": "Pfizer",            "name_b": "Merck",             "sector": "Healthcare"},
-    {"ticker_a": "CL",    "ticker_b": "KMB",   "name_a": "Colgate-Palmolive", "name_b": "Kimberly-Clark",    "sector": "Consumer"},
-    {"ticker_a": "KO",    "ticker_b": "PEP",   "name_a": "Coca-Cola",         "name_b": "PepsiCo",           "sector": "Consumer"},
-    {"ticker_a": "COST",  "ticker_b": "BJ",    "name_a": "Costco",            "name_b": "BJ's Wholesale",    "sector": "Consumer"},
-    {"ticker_a": "GE",    "ticker_b": "BA",    "name_a": "GE Aerospace",      "name_b": "Boeing",            "sector": "Industrials"},
-    {"ticker_a": "V",     "ticker_b": "MA",    "name_a": "Visa",              "name_b": "Mastercard",        "sector": "Financials"},
-    {"ticker_a": "MS",    "ticker_b": "GS",    "name_a": "Morgan Stanley",    "name_b": "Goldman Sachs",     "sector": "Financials"},
-    {"ticker_a": "JPM",   "ticker_b": "BAC",   "name_a": "JPMorgan Chase",    "name_b": "Bank of America",   "sector": "Financials"},
-    {"ticker_a": "XOM",   "ticker_b": "CVX",   "name_a": "ExxonMobil",        "name_b": "Chevron",           "sector": "Energy"},
-    {"ticker_a": "T",     "ticker_b": "VZ",    "name_a": "AT&T",              "name_b": "Verizon",           "sector": "Telecom"},
-    {"ticker_a": "WMT",   "ticker_b": "TGT",   "name_a": "Walmart",           "name_b": "Target",            "sector": "Retail"},
-]
+    # Technology
+    # (no pairs passed cointegration in tech sector, 2020-present window)
 
+    # Healthcare
+    {"ticker_a": "DHR",  "ticker_b": "IQV",  "name_a": "Danaher",                "name_b": "IQVIA Holdings",          "sector": "Healthcare"},
+    {"ticker_a": "TMO",  "ticker_b": "MTD",  "name_a": "Thermo Fisher Scientific","name_b": "Mettler-Toledo",          "sector": "Healthcare"},
+    {"ticker_a": "TMO",  "ticker_b": "IQV",  "name_a": "Thermo Fisher Scientific","name_b": "IQVIA Holdings",          "sector": "Healthcare"},
+    {"ticker_a": "IQV",  "ticker_b": "MTD",  "name_a": "IQVIA Holdings",          "name_b": "Mettler-Toledo",          "sector": "Healthcare"},
+
+    # Financials
+    {"ticker_a": "BLK",  "ticker_b": "COF",  "name_a": "BlackRock",               "name_b": "Capital One",             "sector": "Financials"},
+    {"ticker_a": "WFC",  "ticker_b": "AXP",  "name_a": "Wells Fargo",             "name_b": "American Express",        "sector": "Financials"},
+    {"ticker_a": "PNC",  "ticker_b": "FITB", "name_a": "PNC Financial",           "name_b": "Fifth Third Bancorp",     "sector": "Financials"},
+    {"ticker_a": "GS",   "ticker_b": "BK",   "name_a": "Goldman Sachs",           "name_b": "Bank of New York Mellon", "sector": "Financials"},
+    {"ticker_a": "MS",   "ticker_b": "BK",   "name_a": "Morgan Stanley",          "name_b": "Bank of New York Mellon", "sector": "Financials"},
+    {"ticker_a": "SCHW", "ticker_b": "MTB",  "name_a": "Charles Schwab",          "name_b": "M&T Bank",                "sector": "Financials"},
+
+    # Energy
+    {"ticker_a": "MPC",  "ticker_b": "PSX",  "name_a": "Marathon Petroleum",      "name_b": "Phillips 66",             "sector": "Energy"},
+    {"ticker_a": "EPD",  "ticker_b": "BKR",  "name_a": "Enterprise Products",     "name_b": "Baker Hughes",            "sector": "Energy"},
+    {"ticker_a": "WMB",  "ticker_b": "KMI",  "name_a": "Williams Companies",      "name_b": "Kinder Morgan",           "sector": "Energy"},
+    {"ticker_a": "WMB",  "ticker_b": "EPD",  "name_a": "Williams Companies",      "name_b": "Enterprise Products",     "sector": "Energy"},
+    {"ticker_a": "COP",  "ticker_b": "SLB",  "name_a": "ConocoPhillips",          "name_b": "SLB",                     "sector": "Energy"},
+    {"ticker_a": "MPC",  "ticker_b": "EPD",  "name_a": "Marathon Petroleum",      "name_b": "Enterprise Products",     "sector": "Energy"},
+]
 
 def _safe_float(val):
     try:
@@ -150,7 +160,30 @@ def get_spread():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/screener", methods=["GET"])
+def get_screener():
+    sector = request.args.get("sector", "").lower().strip()
+    if not sector:
+        return jsonify({"error": "Missing required param: sector"}), 400
+    if sector not in SECTOR_TICKERS:
+        return jsonify({"error": f"Unknown sector '{sector}'.", "available_sectors": sorted(SECTOR_TICKERS.keys())}), 400
+    try:
+        min_corr = float(request.args.get("min_corr", 0.70))
+    except ValueError:
+        return jsonify({"error": "min_corr must be a float between 0 and 1."}), 400
+    if not (0.0 <= min_corr <= 1.0):
+        return jsonify({"error": "min_corr must be between 0.0 and 1.0."}), 400
 
+    start = request.args.get("start", "2024-01-01")
+    end = request.args.get("end", str(date.today()))
+
+    try:
+        pairs = screen_sector(SECTOR_TICKERS[sector], start, end, min_corr=min_corr)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"sector": sector, "min_corr": min_corr, "pairs": pairs})
 
 @app.route("/api/risk/breakdown", methods=["GET"])
 def get_risk_breakdown():
