@@ -13,6 +13,7 @@ import MetricsPanel from "@/components/correlation/MetricsPanel";
 import SpreadHistogram from "@/components/correlation/SpreadHistogram";
 import Toast from "@/components/correlation/Toast";
 import RiskWarningBanner from "@/components/correlation/RiskWarningBanner";
+import BacktestPanel from "@/components/correlation/BacktestPanel";
 
 import type {
   PairInfo,
@@ -231,6 +232,12 @@ export default function CorrelationTradingPage() {
                   <SpreadHistogram
                     data={spreadData.data}
                     metrics={spreadData.metrics}
+                  />
+
+                  <BacktestPanel
+                    pair={selectedPair}
+                    dateRange={dateRange}
+                    spreadType={spreadType}
                   />
                 </div>
               )}
