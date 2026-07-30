@@ -107,7 +107,11 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
     elif spread_type == 'ratio':
         spread = calculate_ratio_spread(series_a, series_b, hedge_ratio)
     elif spread_type == 'log_ratio':
+<<<<<<< HEAD
         spread = calculate_log_ratio_spread(series_a, series_b, hedge_ratio)
+=======
+        spread = calculate_log_ratio_spread(series_a, series_b)
+>>>>>>> 93b78d6 (fix: revert log_ratio to use original spread, add statsmodels to requirements)
     else:
         raise ValueError(f"Unknown spread_type: {spread_type}")
     
