@@ -1,5 +1,8 @@
 import os
 import unittest
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 from analysis.backtest import generate_zscore_signals, run_backtest
 
@@ -140,6 +143,47 @@ class TestBacktestHarness(unittest.TestCase):
                     expected_zscore,
                     places=6,
                 )
+
+    def test_stock_data_cache_path_is_versioned(self):
+        from analysis.data_loader import CACHE_VERSION, get_data_path
+
+        path = get_data_path("MSFT", "2023-01-01", "2023-02-01")
+        self.assertIn(f"_{CACHE_VERSION}_raw.csv", path)
+
+    def test_stock_downloads_are_serialized(self):
+        from unittest.mock import patch
+        from analysis.data_loader import get_stock_data
+
+        active = 0
+        max_active = 0
+        active_lock = threading.Lock()
+
+        def fake_download(ticker, *args, **kwargs):
+            nonlocal active, max_active
+            with active_lock:
+                active += 1
+                max_active = max(max_active, active)
+            time.sleep(0.02)
+            with active_lock:
+                active -= 1
+
+            dates = pd.date_range(start="2023-01-02", periods=3)
+            return pd.DataFrame({"Close": [100.0, 101.0, 102.0]}, index=dates)
+
+        with patch("analysis.data_loader.yf.download", side_effect=fake_download):
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                results = list(executor.map(
+                    lambda ticker: get_stock_data(
+                        ticker,
+                        "2023-01-01",
+                        "2023-01-06",
+                        cache=False,
+                    ),
+                    ["AAA", "BBB", "CCC", "DDD"],
+                ))
+
+        self.assertEqual(max_active, 1)
+        self.assertEqual([df["Ticker"].iloc[0] for df in results], ["AAA", "BBB", "CCC", "DDD"])
 
 if __name__ == "__main__":
     unittest.main()
