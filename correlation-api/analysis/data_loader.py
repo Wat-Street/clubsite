@@ -44,8 +44,15 @@ def _cache_is_valid(df, ticker, start_date, end_date):
     last_date = dates.max()
 
     # Allow a few calendar days for weekends, holidays, and yfinance's
-    # exclusive end-date behavior.
-    if first_date > requested_start + pd.Timedelta(days=7):
+    # exclusive end-date behavior. Very long "Max" ranges can legitimately
+    # start late for newer listings, such as BJ's 2018 IPO.
+    requested_days = max((requested_end - requested_start).days, 1)
+    actual_days = max((last_date - first_date).days, 0)
+    long_range_with_later_listing = (
+        requested_days >= 365 * 7 and actual_days / requested_days >= 0.75
+    )
+
+    if first_date > requested_start + pd.Timedelta(days=7) and not long_range_with_later_listing:
         return False
     if last_date < requested_end - pd.Timedelta(days=7):
         return False

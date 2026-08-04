@@ -150,6 +150,30 @@ class TestBacktestHarness(unittest.TestCase):
         path = get_data_path("MSFT", "2023-01-01", "2023-02-01")
         self.assertIn(f"_{CACHE_VERSION}_raw.csv", path)
 
+    def test_stock_data_cache_accepts_long_range_later_listing(self):
+        from analysis.data_loader import _cache_is_valid
+
+        dates = pd.date_range(start="2018-06-28", end="2026-08-03", freq="B")
+        df = pd.DataFrame({
+            "Date": dates,
+            "Close": range(1, len(dates) + 1),
+            "Ticker": "BJ",
+        })
+
+        self.assertTrue(_cache_is_valid(df, "BJ", "2016-08-04", "2026-08-04"))
+
+    def test_stock_data_cache_rejects_short_three_year_coverage(self):
+        from analysis.data_loader import _cache_is_valid
+
+        dates = pd.date_range(start="2025-02-10", end="2026-08-03", freq="B")
+        df = pd.DataFrame({
+            "Date": dates,
+            "Close": range(1, len(dates) + 1),
+            "Ticker": "AMD",
+        })
+
+        self.assertFalse(_cache_is_valid(df, "AMD", "2023-08-04", "2026-08-04"))
+
     def test_stock_downloads_are_serialized(self):
         from unittest.mock import patch
         from analysis.data_loader import get_stock_data
