@@ -25,6 +25,7 @@ export default function FixedHeader() {
   const pathname = usePathname() ?? "/";
   const bannerText = ROUTE_BANNERS[pathname] ?? null;
   const defaultPage = DEFAULT_PAGES[pathname] ?? -1;
+  const showSiteHeader = pathname !== "/correlation-trading";
 
   const [activeBanner, setActiveBanner] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -55,7 +56,20 @@ export default function FixedHeader() {
   };
 
   const showBanner = !!activeBanner && !dismissed;
-  const spacerHeight = HEADER_HEIGHT + (showBanner ? BANNER_HEIGHT : 0);
+  const spacerHeight =
+    (showBanner ? BANNER_HEIGHT : 0) + (showSiteHeader ? HEADER_HEIGHT : 0);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.style.setProperty(
+      "--fixed-header-offset",
+      `${spacerHeight}px`
+    );
+
+    return () => {
+      document.documentElement.style.removeProperty("--fixed-header-offset");
+    };
+  }, [spacerHeight]);
 
   return (
     <>
@@ -87,9 +101,11 @@ export default function FixedHeader() {
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="bg-black">
-          <Header defaultPage={defaultPage} />
-        </div>
+        {showSiteHeader && (
+          <div className="bg-black">
+            <Header defaultPage={defaultPage} />
+          </div>
+        )}
       </div>
       <motion.div
         initial={false}
