@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 
 
 def _safe_divisor(divisor, tol=1e-12):
@@ -27,7 +27,18 @@ def calculate_log_ratio_spread(series_a: pd.Series, series_b: pd.Series, hedge_r
     return log_a - hedge_ratio * log_b
 
 
-def calculate_zscore(spread: pd.Series, window: int | None = 60) -> pd.Series:
+def calculate_zscore_components(spread: pd.Series, window: Optional[int] = 60) -> Tuple[pd.Series, pd.Series, pd.Series]:
+    if window is None:
+        mean = pd.Series(spread.mean(), index=spread.index)
+        std = pd.Series(_safe_divisor(spread.std()), index=spread.index)
+    else:
+        mean = spread.rolling(window=window).mean()
+        std = _safe_divisor(spread.rolling(window=window).std())
+
+    return mean, std, (spread - mean) / std
+
+
+def calculate_zscore(spread: pd.Series, window: Optional[int] = 60) -> pd.Series:
     """
     Calculate z-score of the spread.
     
@@ -38,14 +49,8 @@ def calculate_zscore(spread: pd.Series, window: int | None = 60) -> pd.Series:
     Returns:
         Z-score normalized spread
     """
-    if window is None:
-        mean = spread.mean()
-        std = _safe_divisor(spread.std())
-    else:
-        mean = spread.rolling(window=window).mean()
-        std = _safe_divisor(spread.rolling(window=window).std())
-    
-    return (spread - mean) / std
+    _, _, zscore = calculate_zscore_components(spread, window=window)
+    return zscore
 
 
 def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str, 
@@ -81,7 +86,7 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
     else:
         raise ValueError(f"Unknown spread_type: {spread_type}")
     
-    zscore = calculate_zscore(spread, window=window)
+    zscore_mean, zscore_std, zscore = calculate_zscore_components(spread, window=window)
     
     result_df = pd.DataFrame({
         'Date': df['Date'].values,
@@ -93,17 +98,22 @@ def calculate_spread_metrics(df: pd.DataFrame, ticker_a: str, ticker_b: str,
     
     clean_spread = spread.dropna()
     clean_zscore = zscore.dropna()
+    clean_zscore_mean = zscore_mean.dropna()
+    clean_zscore_std = zscore_std.dropna()
 
     metrics = {
         'spread_type': spread_type,
         'ticker_a': ticker_a,
         'ticker_b': ticker_b,
+        'zscore_window': window,
         'num_observations': len(clean_spread),
         'mean': float(clean_spread.mean()) if len(clean_spread) > 0 else 0.0,
         'std': float(clean_spread.std()) if len(clean_spread) > 0 else 0.0,
         'min': float(clean_spread.min()) if len(clean_spread) > 0 else 0.0,
         'max': float(clean_spread.max()) if len(clean_spread) > 0 else 0.0,
         'current': float(clean_spread.iloc[-1]) if len(clean_spread) > 0 else 0.0,
+        'current_mean': float(clean_zscore_mean.iloc[-1]) if len(clean_zscore_mean) > 0 else 0.0,
+        'current_std': float(clean_zscore_std.iloc[-1]) if len(clean_zscore_std) > 0 else 0.0,
         'current_zscore': float(clean_zscore.iloc[-1]) if len(clean_zscore) > 0 else 0.0,
     }
     

@@ -103,5 +103,43 @@ class TestBacktestHarness(unittest.TestCase):
                 
                 print(f"\n[API MOCK TEST SUCCESS] Sharpe: {metrics['sharpe']:.4f}, Max DD: {metrics['max_drawdown']:.4f}, Trades: {metrics['num_trades']}, Win Rate: {metrics['win_rate']:.4%}")
 
+    def test_spread_api_uses_window_for_zscore_not_hedge_ratio(self):
+        from unittest.mock import patch
+        from app import app
+        import numpy as np
+
+        dates = pd.date_range(start="2023-01-01", periods=100)
+        mock_df = pd.DataFrame({
+            "Date": dates,
+            "Close_MSFT": 100.0 + np.arange(100) * 0.5,
+            "Ticker_MSFT": ["MSFT"] * 100,
+            "Close_GOOGL": [100.0] * 100,
+            "Ticker_GOOGL": ["GOOGL"] * 100,
+        })
+
+        with patch("app.load_pair_data") as mock_load:
+            mock_load.return_value = mock_df
+            with app.test_client() as client:
+                resp = client.get(
+                    "/api/spread?ticker_a=MSFT&ticker_b=GOOGL&window=20&spread_type=log_ratio"
+                )
+                self.assertEqual(resp.status_code, 200)
+                data = resp.get_json()
+                metrics = data["metrics"]
+
+                self.assertLess(abs(metrics["current"]), 1.0)
+                self.assertEqual(metrics["zscore_window"], 20.0)
+                self.assertIn("current_mean", metrics)
+                self.assertIn("current_std", metrics)
+
+                expected_zscore = (
+                    metrics["current"] - metrics["current_mean"]
+                ) / metrics["current_std"]
+                self.assertAlmostEqual(
+                    metrics["current_zscore"],
+                    expected_zscore,
+                    places=6,
+                )
+
 if __name__ == "__main__":
     unittest.main()

@@ -118,7 +118,13 @@ def get_spread():
 
     try:
         df = load_pair_data(ticker_a, ticker_b, start, end)
-        spread_df, metrics = calculate_spread_metrics(df, ticker_a, ticker_b, spread_type, window)
+        spread_df, metrics = calculate_spread_metrics(
+            df,
+            ticker_a,
+            ticker_b,
+            spread_type=spread_type,
+            window=window,
+        )
 
         price_a = spread_df[f"{ticker_a}_price"]
         price_b = spread_df[f"{ticker_b}_price"]
@@ -207,7 +213,13 @@ def get_backtest():
         if len(df) == 0:
             return jsonify({"error": "No data found for the given tickers and date range"}), 400
 
-        spread_df, _ = calculate_spread_metrics(df, ticker_a, ticker_b, spread_type, hedge_ratio)
+        spread_df, _ = calculate_spread_metrics(
+            df,
+            ticker_a,
+            ticker_b,
+            spread_type=spread_type,
+            hedge_ratio=hedge_ratio,
+        )
         
         spread_df = spread_df.set_index(pd.to_datetime(spread_df["Date"]))
 
